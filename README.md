@@ -154,7 +154,7 @@ branch는 작업 단위 & 기능 단위로 생성하며 이는 issue를 기반�
 
 ### 2. Branch Naming Rule
 
-branch를 생성하기 전 issue를 먼저 작성합니다. issue 작성 후 생성되는 번호와 domain 명을 조합하여 branch의 이름을 결정합니다. `<Prefix>/#<Issue_Number>-<Domain>-<Description>` 의 양식을 준수합니다.
+branch를 생성하기 전 issue를 먼저 작성합니다. issue 작성 후 생성되는 번호와 domain 명을 조합하여 branch의 이름을 결정합니다. `<Prefix>/DEV-#<Issue_Number>-<Domain>-<Description>` 의 양식을 준수합니다.
 
 ### 3. Prefix
 
