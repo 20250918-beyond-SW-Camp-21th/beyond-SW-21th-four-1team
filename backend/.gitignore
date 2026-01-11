@@ -49,4 +49,8 @@ gradle/wrapper/gradle-wrapper.jar
 ### Sensitive Information ###
 # 로컬 설정 파일이나 비밀번호가 포함된 파일
 application-local.yml
+# local spring config
+backend/src/main/resources/application-local.yml
+
+
 *.env

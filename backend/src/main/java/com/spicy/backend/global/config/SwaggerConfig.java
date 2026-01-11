@@ -40,6 +40,16 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi settlementGroup() {
+        return GroupedOpenApi.builder()
+                .group("Settlement API")
+                .pathsToMatch(
+                        "/api/v1/settlements/**"
+                )
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi allGroup() {
         return GroupedOpenApi.builder()
                 .group("전체 API")
