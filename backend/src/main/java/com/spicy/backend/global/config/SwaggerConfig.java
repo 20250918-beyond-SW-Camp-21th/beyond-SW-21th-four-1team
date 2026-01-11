@@ -11,6 +11,27 @@ import org.springdoc.core.models.GroupedOpenApi;
 public class SwaggerConfig {
 
     @Bean
+    public GroupedOpenApi authGroup() {
+        return GroupedOpenApi.builder()
+                .group("Auth API")
+                .pathsToMatch(
+                        "/api/v1/auth/**"
+                )
+                .build();
+    }
+
+
+    @Bean
+    public GroupedOpenApi userGroup() {
+        return GroupedOpenApi.builder()
+                .group("User API")
+                .pathsToMatch(
+                        "/api/v1/users/**"
+                )
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi orderGroup() {
         return GroupedOpenApi.builder()
                 .group("Order API")
