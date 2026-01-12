@@ -48,4 +48,13 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    public void updateInfo(String name, String email) {
+        this.username = name;
+        this.email = email;
+    }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }

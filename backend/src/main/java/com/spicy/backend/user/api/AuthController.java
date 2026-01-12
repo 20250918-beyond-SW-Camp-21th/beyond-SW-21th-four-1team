@@ -1,8 +1,10 @@
 package com.spicy.backend.user.api;
 
 import com.spicy.backend.global.common.ApiResponse;
+import com.spicy.backend.user.application.AuthService;
 import com.spicy.backend.user.dto.request.LoginRequest;
 import com.spicy.backend.user.dto.request.LogoutRequest;
+import com.spicy.backend.user.dto.request.ReissueRequest;
 import com.spicy.backend.user.dto.request.SignUpRequest;
 import com.spicy.backend.user.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,11 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
+    private final AuthService authService;
+
     @Operation(summary = "회원가입", description = "아이디, 비밀번호, 이름, 이메일을 입력해 회원가입한다.")
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signup(
             @Valid @RequestBody SignUpRequest request
     ) {
+        authService.signup(request);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 
@@ -32,7 +37,17 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success(null));
+        LoginResponse response = authService.login(request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "토큰 재발급", description = "만료된 Access Token을 Refresh Token을 사용하여 재발급한다.")
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<LoginResponse>> reissue(
+            @Valid @RequestBody ReissueRequest request
+    ) {
+        LoginResponse response = authService.reissue(request.refreshToken());
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @Operation(summary = "로그아웃", description = "사용자의 refresh 토큰을 만료시켜 로그아웃 처리한다.")
@@ -40,6 +55,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logout(
             @Valid @RequestBody LogoutRequest request
     ) {
+        authService.logout(request);
         return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
