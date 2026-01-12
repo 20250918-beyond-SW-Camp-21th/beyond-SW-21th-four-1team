@@ -1,6 +1,8 @@
 package com.spicy.backend.inventory.domain;
 
 import com.spicy.backend.global.entity.BaseEntity;
+import com.spicy.backend.global.error.exception.BusinessException;
+import com.spicy.backend.inventory.error.InventoryErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -58,4 +61,21 @@ public class Inventory extends BaseEntity {
     //상품 설명
     @Column(nullable = false)
     private String description;
+
+    public void decreaseQuantity(int amount) {
+        if (amount > this.quantity) {
+            throw new BusinessException(InventoryErrorCode.OUT_OF_STOCK);
+        }
+        this.quantity -= amount;
+
+        if (this.quantity == 0) {
+            this.status = LotStatus.CONSUMED;
+        }
+    }
+
+    public void markAsExpired() {
+        if (this.status != LotStatus.EXPIRED) {
+            this.status = LotStatus.EXPIRED;
+        }
+    }
 }

@@ -16,6 +16,10 @@ public record InventoryRequest(
 
         // 유통기한
         @NotNull(message = "유통기한은 필수입니다.")
-        LocalDate expirationDate
+        LocalDate expirationDate,
+
+        //상품 일련번호
+        @NotNull(message = "일련번호는 필수입니다.")
+        String productCode
 ) {
 }

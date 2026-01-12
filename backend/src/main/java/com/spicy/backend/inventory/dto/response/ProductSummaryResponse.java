@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record ProductSummaryResponse(
+        // 상품 ID
+        Long productId,
         // 상품 이름
         String productName,
         // 상품 가격
