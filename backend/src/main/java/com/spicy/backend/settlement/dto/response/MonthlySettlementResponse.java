@@ -2,10 +2,12 @@ package com.spicy.backend.settlement.dto.response;
 
 import com.spicy.backend.settlement.enums.SettlementStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Builder
 public record MonthlySettlementResponse(
         @Schema(description = "해당 월 주문 금액 합계", example = "5000000.00")
         BigDecimal totalAmount,
