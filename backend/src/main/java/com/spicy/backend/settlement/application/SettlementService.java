@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
+import java.util.Comparator;
 import java.util.List;
 
 @Service // 1. 서비스 빈 등록 필수
@@ -62,7 +63,8 @@ public class SettlementService {
         BigDecimal totalComm = monthlyList.stream().map(Settlement::getCommissionAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalSettle = monthlyList.stream().map(Settlement::getSettlementAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return monthlyList.stream().findFirst()
+        return monthlyList.stream()
+                .max(Comparator.comparing(Settlement::getSettlementDate))
                 .map(s -> MonthlySettlementResponse.builder()
                         .totalAmount(totalOrder)
                         .commissionAmount(totalComm)
@@ -74,6 +76,8 @@ public class SettlementService {
                         .totalAmount(BigDecimal.ZERO)
                         .commissionAmount(BigDecimal.ZERO)
                         .settlementAmount(BigDecimal.ZERO)
+                        .status(null)
+                        .payoutDate(null)
                         .build());
     }
 }
