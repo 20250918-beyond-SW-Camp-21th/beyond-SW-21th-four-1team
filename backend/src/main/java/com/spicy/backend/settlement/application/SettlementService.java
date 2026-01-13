@@ -43,8 +43,8 @@ public class SettlementService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return DailySettlementResponse.builder()
-                .orderCount(daily != null ? daily.getOrderCount() : 0)
-                .dailyAmount(daily != null ? daily.getTotalOrderAmount() : BigDecimal.ZERO)
+                .orderCount(daily.getOrderCount())
+                .dailyAmount(daily.getTotalOrderAmount())
                 .monthlyAccumulatedAmount(accumulatedAmount)
                 .build();
     }
