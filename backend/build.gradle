@@ -38,6 +38,14 @@ dependencies {
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
 
+    // PDF 생성을 위한 iText 라이브러리
+    implementation 'com.itextpdf:html2pdf:5.0.0'
+
+    //
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+
+
     // QueryDSL (Spring Boot 3.x / Jakarta EE)
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
     annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
