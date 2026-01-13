@@ -1,7 +1,9 @@
 package com.spicy.backend.order.domain;
 
 import com.spicy.backend.global.entity.BaseEntity;
+import com.spicy.backend.order.dto.request.OrderCreateRequest;
 import com.spicy.backend.order.enums.Status;
+import com.spicy.backend.order.util.OrderNumberGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,8 +46,9 @@ public class Order extends BaseEntity {
 
     // 주문 상태
     @Column(nullable = false)
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.PENDING;
 
     // 희망 배송일
     @Column(nullable = false)
@@ -68,4 +71,26 @@ public class Order extends BaseEntity {
     private String memo;
 
     // 주문 일시 - createdAt
+
+    public void updateTotalPrice(BigDecimal totalPrice) {
+        this.totalAmount = totalPrice;
+    }
+
+    public static Order create(OrderCreateRequest request, Long storeId) {
+        return Order.builder()
+                .storeId(storeId)
+                .deliveryDate(request.deliveryDate())
+                .address(request.address())
+                .receiverName(request.receiverName())
+                .receiverPhone(request.receiverPhone())
+                .memo(request.memo())
+                .status(Status.PENDING)
+                .orderNumber(OrderNumberGenerator.generate())
+                .totalAmount(BigDecimal.ZERO)
+                .build();
+    }
+
+    public void updateStatus(Status status) {
+        this.status = status;
+    }
 }

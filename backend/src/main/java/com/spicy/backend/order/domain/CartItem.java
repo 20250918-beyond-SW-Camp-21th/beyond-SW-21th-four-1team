@@ -1,5 +1,6 @@
 package com.spicy.backend.order.domain;
 
+import com.spicy.backend.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class CartItem {
+public class CartItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,6 +29,10 @@ public class CartItem {
     // fk: 가맹점 식별 번호
     @Column(nullable = false)
     private Long storeId;
+
+    // fk: 사용자 식별 번호
+    @Column(nullable = false)
+    private Long userId;
 
     // fk: 상품 식별 번호
     @ManyToOne(fetch = FetchType.LAZY)

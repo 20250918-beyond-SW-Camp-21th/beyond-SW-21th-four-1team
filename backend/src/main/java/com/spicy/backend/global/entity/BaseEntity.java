@@ -1,5 +1,6 @@
 package com.spicy.backend.global.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
@@ -15,8 +16,22 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
 
     @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    // 삭제 일시
+    private LocalDateTime deletedAt;
+
+    // 삭제 처리 메소드
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    // 삭제 확인 메소드
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
 }

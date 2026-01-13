@@ -1,5 +1,6 @@
 package com.spicy.backend.order.domain;
 
+import com.spicy.backend.global.entity.BaseEntity;
 import com.spicy.backend.order.enums.Category;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product {
+public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
