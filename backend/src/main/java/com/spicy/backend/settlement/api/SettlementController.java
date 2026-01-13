@@ -1,6 +1,7 @@
 package com.spicy.backend.settlement.api;
 
 
+import com.spicy.backend.settlement.application.SettlementService;
 import com.spicy.backend.settlement.dto.request.DailySettlementRequest;
 import com.spicy.backend.settlement.dto.request.MonthlySettlementRequest;
 import com.spicy.backend.settlement.dto.response.DailySettlementResponse;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/settlements")
 public class SettlementController {
 
+    private final SettlementService settlementService;
+
     //일별 정산 조회 API
 
     @Operation(
@@ -30,7 +33,8 @@ public class SettlementController {
     @GetMapping("/daily")
     public ResponseEntity<DailySettlementResponse> getDailySettlement(
             @Valid DailySettlementRequest request) {
-        return ResponseEntity.ok(null);
+        DailySettlementResponse response = settlementService.getDailySettlement(request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -41,7 +45,7 @@ public class SettlementController {
     @GetMapping("/monthly")
     public ResponseEntity<MonthlySettlementResponse> getMonthlySettlement(
             @Valid MonthlySettlementRequest request) {
-        return ResponseEntity.ok(null);
+        MonthlySettlementResponse response = settlementService.getMonthlySettlement(request);
+        return ResponseEntity.ok(response);
     }
-
 }

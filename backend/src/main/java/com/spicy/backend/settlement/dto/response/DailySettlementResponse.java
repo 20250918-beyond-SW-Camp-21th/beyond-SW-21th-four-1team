@@ -1,9 +1,11 @@
 package com.spicy.backend.settlement.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
 public record DailySettlementResponse(
         @Schema(description = "주문 건수", example = "15")
         Integer orderCount,
