@@ -3,12 +3,14 @@ package com.spicy.backend.settlement.application;
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.spicy.backend.settlement.dto.response.MonthlySettlementResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.ByteArrayOutputStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SettlementFileService {
@@ -29,7 +31,10 @@ public class SettlementFileService {
                 HtmlConverter.convertToPdf(htmlContent, target);
                 byte[] pdfBytes = target.toByteArray();
 
-                // 3. Object Storage 업로드 로직
+                // 3. [로그 추가 위치] 실제 반환 직전
+                log.warn("Object Storage 업로드 미구현 - 임시 URL 반환: storeId={}", data.totalAmount()); //
+
+                // TODO: 실제 S3 또는 MinIO 업로드 로직으로 교체 필요
                 return "https://storage.example.com/settlements/2026-01-report.pdf";
             }
         } catch (Exception e) {
