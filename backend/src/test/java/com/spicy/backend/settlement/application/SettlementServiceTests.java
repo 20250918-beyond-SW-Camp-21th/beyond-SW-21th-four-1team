@@ -1,5 +1,6 @@
 package com.spicy.backend.settlement.application;
 
+import com.spicy.backend.global.error.exception.BusinessException;
 import com.spicy.backend.settlement.dao.SettlementRepository;
 import com.spicy.backend.settlement.domain.Settlement;
 import com.spicy.backend.settlement.dto.request.DailySettlementRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -107,4 +109,27 @@ class SettlementServiceTests {
                 .status(SettlementStatus.WAITING)
                 .build();
     }
+
+
+    @Test
+    @DisplayName("실패: 해당 날짜에 정산 데이터가 없으면 예외가 발생해야 한다")
+    void getDailySettlement_NotFound() {
+        // given
+        Long storeId = 1L;
+        LocalDate date = LocalDate.of(2026, 1, 30); // 없는 날짜 가정
+        DailySettlementRequest request = new DailySettlementRequest(storeId, date);
+
+        // Mock: 리포지토리가 "데이터 없음(Empty)"을 반환한다고 설정
+        given(settlementRepository.findByStoreIdAndSettlementDate(storeId, date))
+                .willReturn(Optional.empty());
+
+        // when & then: 서비스가 BusinessException을 잘 던지는지 확인
+        assertThatThrownBy(() -> settlementService.getDailySettlement(request))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("정산 내역이 존재하지 않습니다"); // 에러 메시지 검증
+    }
+
+
+
+
 }
