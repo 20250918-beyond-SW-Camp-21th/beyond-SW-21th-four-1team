@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>월별 정산 명세서</title>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        h1 { text-align: center; }
+    </style>
+</head>
+<body>
+<h1>월별 정산 명세서</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>항목</th>
+        <th>금액 / 내용</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>총 주문 금액</td>
+        <td th:text="${#numbers.formatDecimal(settlement.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' 원'">0 원</td>
+    </tr>
+    <tr>
+        <td>수수료</td>
+        <td th:text="${#numbers.formatDecimal(settlement.commissionAmount, 0, 'COMMA', 0, 'POINT')} + ' 원'">0 원</td>
+    </tr>
+    <tr>
+        <td><strong>최종 정산 금액</strong></td>
+        <td><strong th:text="${#numbers.formatDecimal(settlement.settlementAmount, 0, 'COMMA', 0, 'POINT')} + ' 원'">0 원</strong></td>
+    </tr>
+    <tr>
+        <td>정산 상태</td>
+        <td th:text="${settlement.status}">WAITING</td>
+    </tr>
+    <tr>
+        <td>지급 예정일</td>
+        <td th:text="${settlement.payoutDate}">2026-01-01</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
