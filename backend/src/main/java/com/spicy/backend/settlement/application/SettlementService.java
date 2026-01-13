@@ -1,6 +1,6 @@
 package com.spicy.backend.settlement.application;
 
-import com.spicy.backend.settlement.dao.SettlementRepository; // Custom 대신 통합 Repository 주입
+import com.spicy.backend.settlement.dao.SettlementRepository;
 import com.spicy.backend.settlement.domain.Settlement;
 import com.spicy.backend.settlement.dto.request.DailySettlementRequest;
 import com.spicy.backend.settlement.dto.request.MonthlySettlementRequest;
@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Service // 1. 서비스 빈 등록 필수
@@ -46,7 +47,12 @@ public class SettlementService {
     }
 
     public MonthlySettlementResponse getMonthlySettlement(MonthlySettlementRequest request) {
-        YearMonth ym = YearMonth.parse(request.yearMonth());
+        YearMonth ym;
+        try {
+            ym = YearMonth.parse(request.yearMonth());
+            } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("잘못된 년월 형식입니다: " + request.yearMonth(), e);
+            }
 
         // sotreId() -> storeId() 오타 수정
         List<Settlement> monthlyList = settlementRepository.findByStoreIdAndSettlementDateBetween(
