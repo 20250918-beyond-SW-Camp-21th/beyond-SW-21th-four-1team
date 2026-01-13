@@ -73,11 +73,22 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi demandPlanGroup() {
+        return GroupedOpenApi.builder()
+                .group("DemandPlan API")
+                .pathsToMatch(
+                        "/api/v1/demand-plan/**"
+                )
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi allGroup() {
         return GroupedOpenApi.builder()
                 .group("전체 API")
                 .pathsToMatch("/**")
                 .build();
+
     }
 
     @Bean
