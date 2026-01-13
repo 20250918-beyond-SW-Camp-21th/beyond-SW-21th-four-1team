@@ -15,14 +15,17 @@ public class SettlementCustomRepositoryImpl implements SettlementCustomRepositor
 
     @Override
     public void bulkInsertSettlements(List<Settlement> settlements) {
+        if (settlements == null || settlements.isEmpty()) {
+            return;
+        }
         String sql = "INSERT INTO settlement (store_id, settlement_date, order_count, total_order_amount, " +
                 "commission_amount, settlement_amount, status, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
 
         jdbcTemplate.batchUpdate(sql, settlements, 1000, (ps, settlement) -> {
-            ps.setLong(1, settlement.getStoreId());
+            ps.setObject(1, settlement.getStoreId());
             ps.setDate(2, Date.valueOf(settlement.getSettlementDate()));
-            ps.setInt(3, settlement.getOrderCount());
+            ps.setObject(3, settlement.getOrderCount());
             ps.setBigDecimal(4, settlement.getTotalOrderAmount());
             ps.setBigDecimal(5, settlement.getCommissionAmount());
             ps.setBigDecimal(6, settlement.getSettlementAmount());
