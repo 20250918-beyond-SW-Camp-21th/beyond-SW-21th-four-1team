@@ -1,6 +1,7 @@
 package com.spicy.backend.global.jwt;
 
 import com.spicy.backend.user.domain.User;
+import com.spicy.backend.user.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -87,5 +88,25 @@ public class JwtProvider {
                 .getPayload();
 
         return Long.parseLong(claims.getSubject());
+    }
+
+    public UserRole getRole(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        String roleName = claims.get("role", String.class);
+
+        if (roleName == null || roleName.isBlank()) {
+            return null;
+        }
+
+        try {
+            return UserRole.valueOf(roleName);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

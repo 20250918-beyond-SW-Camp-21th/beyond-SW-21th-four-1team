@@ -13,6 +13,7 @@ import com.spicy.backend.user.error.UserErrorCode;
 import com.spicy.backend.user.storage.RefreshTokenRepository;
 import com.spicy.backend.user.storage.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,9 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
 
+    @Value("${spicy.admin-key}")
+    private String adminSignupKey;
+
     @Override
     public void signup(SignUpRequest request) {
 
@@ -36,12 +40,23 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(UserErrorCode.DUPLICATE_LOGIN_ID);
         }
 
+        // 기본 권한은 가맹점으로 설정
+        UserRole targetRole = UserRole.FRANCHISE;
+
+        // HQ 권한 가입 요청 시 토큰 검증
+        if (request.userRole() == UserRole.HQ) {
+            if (request.adminToken() == null || !request.adminToken().equals(adminSignupKey)) {
+                throw new BusinessException(UserErrorCode.INVALID_ADMIN_TOKEN);
+            }
+            targetRole = UserRole.HQ;
+        }
+
         User user = User.builder()
                 .loginId(request.loginId())
                 .password(passwordEncoder.encode(request.password()))
                 .username(request.username())
                 .email(request.email())
-                .userRole(UserRole.FRANCHISE)
+                .userRole(targetRole)
                 .build();
 
         userRepository.save(user);

@@ -5,7 +5,9 @@ import com.spicy.backend.user.domain.User;
 import com.spicy.backend.user.dto.request.UpdateMyInfoRequest;
 import com.spicy.backend.user.dto.request.UpdatePasswordRequest;
 import com.spicy.backend.user.dto.response.MyInfoResponse;
+import com.spicy.backend.user.dto.response.UserHQViewResponse;
 import com.spicy.backend.user.error.UserErrorCode;
+import com.spicy.backend.user.storage.RefreshTokenRepository;
 import com.spicy.backend.user.storage.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +35,9 @@ class UserServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+
     /* 내 정보 조회 테스트 */
     @Test
     void getMe_success() {
@@ -53,6 +58,28 @@ class UserServiceImplTest {
         // then
         assertThat(response.username()).isEqualTo("홍길동");
         assertThat(response.email()).isEqualTo("test@test.com");
+    }
+
+    /* 특정 회원 조회 테스트 */
+    @Test
+    void getUser_success() {
+
+        // given
+        Long targetUserId = 2L;
+        User targetUser = User.builder()
+                .id(targetUserId)
+                .username("가맹점주")
+                .email("franchise@test.com")
+                .build();
+
+        given(userRepository.findById(targetUserId)).willReturn(Optional.of(targetUser));
+
+        // when
+        UserHQViewResponse response = userService.getUser(targetUserId);
+
+        // then
+        assertThat(response.username()).isEqualTo("가맹점주");
+        assertThat(response.email()).isEqualTo("franchise@test.com");
     }
 
     /* 내 정보 수정 테스트 */
@@ -77,6 +104,7 @@ class UserServiceImplTest {
         assertThat(user.getUsername()).isEqualTo("새이름");
         assertThat(user.getEmail()).isEqualTo("new@test.com");
     }
+
     /* 비밀번호 변경 테스트 */
     @Test
     void updatePassword_success() {
@@ -114,6 +142,7 @@ class UserServiceImplTest {
         userService.withdraw(userId);
 
         // then
+        verify(refreshTokenRepository).deleteByUserId(userId);
         verify(userRepository).delete(user);
     }
 

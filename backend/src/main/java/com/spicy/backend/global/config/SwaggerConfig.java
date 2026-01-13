@@ -1,5 +1,8 @@
 package com.spicy.backend.global.config;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +22,6 @@ public class SwaggerConfig {
                 )
                 .build();
     }
-
 
     @Bean
     public GroupedOpenApi userGroup() {
@@ -80,9 +82,9 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
-//        String jwtSchemeName = "bearerAuth";
+        String jwtSchemeName = "bearerAuth";
 
-        /*SecurityScheme securityScheme = new SecurityScheme()
+        SecurityScheme securityScheme = new SecurityScheme()
                 .name(jwtSchemeName)
                 .type(SecurityScheme.Type.HTTP)   // HTTP 인증
                 .scheme("bearer")                 // Bearer 토큰
@@ -90,12 +92,12 @@ public class SwaggerConfig {
                 .in(SecurityScheme.In.HEADER);    // Authorization 헤더
 
         SecurityRequirement securityRequirement = new SecurityRequirement()
-                .addList(jwtSchemeName);*/
+                .addList(jwtSchemeName);
 
         return new OpenAPI()
-                /*.components(new Components()
+                .components(new Components()
                         .addSecuritySchemes(jwtSchemeName, securityScheme))
-                .addSecurityItem(securityRequirement)*/
+                .addSecurityItem(securityRequirement)
                 .info(new Info()
                         .title("AccountBookForMoms API")
                         .version("v1"));

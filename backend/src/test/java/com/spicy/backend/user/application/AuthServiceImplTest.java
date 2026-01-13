@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -27,7 +28,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
@@ -47,14 +47,34 @@ class AuthServiceImplTest {
     @Mock
     private JwtProvider jwtProvider;
 
-    /* 회원가입 테스트 */
+    /* FRANCHISE(가맹점 관리자) 회원가입 테스트 */
     @Test
-    void signup_success() {
+    void signup_franchise_success() {
 
-        // given
-        SignUpRequest request = new SignUpRequest("testId", "password", "홍길동", "test@test.com");
+        // given - userRole을 null로 보내면 기본 FRANCHISE
+        SignUpRequest request = new SignUpRequest("testId", "password", "홍길동", "test@test.com", null, null);
 
         given(userRepository.existsByLoginId("testId")).willReturn(false);
+        given(passwordEncoder.encode("password")).willReturn("encodedPassword");
+
+        // when
+        authService.signup(request);
+
+        // then
+        verify(userRepository).save(any(User.class));
+    }
+
+    /* HQ(본사 관리자) 회원가입 테스트 */
+    @Test
+    void signup_hq_success() {
+
+        // given - 올바른 adminToken과 HQ 역할 전달
+        String validAdminToken = "test-admin-key";
+        ReflectionTestUtils.setField(authService, "adminSignupKey", validAdminToken);
+
+        SignUpRequest request = new SignUpRequest("adminId", "password", "관리자", "admin@test.com", UserRole.HQ, validAdminToken);
+
+        given(userRepository.existsByLoginId("adminId")).willReturn(false);
         given(passwordEncoder.encode("password")).willReturn("encodedPassword");
 
         // when
@@ -136,12 +156,26 @@ class AuthServiceImplTest {
         verify(refreshTokenRepository).deleteByToken("refreshToken");
     }
 
+    /* HQ 가입 시 토큰 불일치 예외 테스트 */
+    @Test
+    void signup_hq_invalidToken_throwException() {
+
+        // given
+        ReflectionTestUtils.setField(authService, "adminSignupKey", "correct-key");
+        SignUpRequest request = new SignUpRequest("adminId", "password", "관리자", "admin@test.com", UserRole.HQ, "wrong-key");
+
+        // when & then
+        assertThatThrownBy(() -> authService.signup(request))
+                .isInstanceOf(BusinessException.class)
+                .hasFieldOrPropertyWithValue("errorCode", UserErrorCode.INVALID_ADMIN_TOKEN);
+    }
+
     /* 중복 로그인 ID 예외 테스트 */
     @Test
     void signup_duplicateLoginId_throwException() {
 
         // given
-        SignUpRequest request = new SignUpRequest("testId", "password", "홍길동", "test@test.com");
+        SignUpRequest request = new SignUpRequest("testId", "password", "홍길동", "test@test.com", null, null);
         given(userRepository.existsByLoginId("testId")).willReturn(true);
 
         // when & then
