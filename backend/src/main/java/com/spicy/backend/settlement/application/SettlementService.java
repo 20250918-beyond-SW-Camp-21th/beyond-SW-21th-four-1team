@@ -1,12 +1,15 @@
 package com.spicy.backend.settlement.application;
 
 import com.spicy.backend.global.error.exception.BusinessException;
+import com.spicy.backend.order.dao.order.OrderRepository;
+import com.spicy.backend.order.domain.Order;
 import com.spicy.backend.settlement.dao.SettlementRepository;
 import com.spicy.backend.settlement.domain.Settlement;
 import com.spicy.backend.settlement.dto.request.DailySettlementRequest;
 import com.spicy.backend.settlement.dto.request.MonthlySettlementRequest;
 import com.spicy.backend.settlement.dto.response.DailySettlementResponse;
 import com.spicy.backend.settlement.dto.response.MonthlySettlementResponse;
+import com.spicy.backend.settlement.enums.SettlementStatus;
 import com.spicy.backend.settlement.error.SettlementErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ public class SettlementService {
 
 
     private final SettlementRepository settlementRepository;
+    private final OrderRepository orderRepository;
 
     public DailySettlementResponse getDailySettlement(DailySettlementRequest request) {
         // 특정 날짜 데이터 조회
@@ -81,5 +85,29 @@ public class SettlementService {
                         .status(null)
                         .payoutDate(null)
                         .build());
+    }
+
+    @Transactional
+    public void createSettlement(Long storeId, LocalDate targetDate) {
+        // 1. 해당 가게의 해당 날짜 주문 다 가져오기
+        List<Order> orders = orderRepository.findAllByStoreIdAndDate(storeId, targetDate);
+
+        // 2. 계산하기
+        BigDecimal totalAmount = orders.stream().map(Order::getTotalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal commission = totalAmount.multiply(new BigDecimal("0.05")); // 예: 수수료 5%
+        BigDecimal settleAmount = totalAmount.subtract(commission);
+
+        // 3. 엔티티 만들기
+        Settlement settlement = Settlement.builder()
+                .storeId(storeId)
+                .settlementDate(targetDate)
+                .totalOrderAmount(totalAmount)
+                .commissionAmount(commission)
+                .settlementAmount(settleAmount)
+                .status(SettlementStatus.WAITING)
+                .build();
+
+        // 4. 저장! (이게 없어서 DB에 없었던 것)
+        settlementRepository.save(settlement);
     }
 }
