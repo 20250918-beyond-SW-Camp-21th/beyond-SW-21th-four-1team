@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>정산 명세서</title>
+    <style>
+        @import url('http://fonts.googleapis.com/earlyaccess/nanumgothic.css');
+
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+            padding: 40px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid #ff6b6b; /* 포인트 컬러 */
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: right; /* 숫자는 우측 정렬 */
+        }
+
+        th {
+            background-color: #f8f9fa;
+            text-align: center; /* 헤더는 가운데 정렬 */
+            font-weight: bold;
+        }
+
+        .total-row {
+            background-color: #fff0f0;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📑 <span th:text="${settlementMonth}">1</span>월 정산 명세서</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th width="40%">항목</th>
+            <th>금액 / 내용</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>총 주문 금액</td>
+            <td th:text="${#numbers.formatInteger(settlement.totalAmount, 0, 'COMMA')} + ' 원'">0 원</td>
+        </tr>
+        <tr>
+            <td>플랫폼 수수료 (5%)</td>
+            <td style="color: red;">
+                - <span th:text="${#numbers.formatInteger(settlement.commissionAmount, 0, 'COMMA')}">0</span> 원
+            </td>
+        </tr>
+        <tr class="total-row">
+            <td>최종 정산 금액</td>
+            <td style="color: #d63031;">
+                <span th:text="${#numbers.formatInteger(settlement.settlementAmount, 0, 'COMMA')}">0</span> 원
+            </td>
+        </tr>
+        <tr>
+            <td>정산 상태</td>
+            <td th:text="${settlement.status}">WAITING</td>
+        </tr>
+        <tr>
+            <td>지급 예정일</td>
+            <td th:text="${settlement.payoutDate}">2026-01-01</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>* 본 문서는 Spicy Backend 시스템에서 자동 생성되었습니다.</p>
+    </div>
+</div>
+
+</body>
+</html>
