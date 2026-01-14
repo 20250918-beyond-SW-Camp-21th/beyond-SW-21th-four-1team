@@ -178,11 +178,11 @@ public class InventoryService {
     }
 
     public Void inbound(@Valid InventoryRequest inventoryRequest) {
-        Inventory inventory = inventoryRepository.findFirstByProductIdOrderByIdAsc(inventoryRequest.productId())
+        Inventory inventory = inventoryRepository.findFirstByProductNameOrderByIdAsc(inventoryRequest.name())
                 .orElseThrow(() -> new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND));
 
         Inventory insertInventory = Inventory.builder()
-                .productId(inventoryRequest.productId())
+                .productId(inventory.getProductId())
                 .quantity(inventoryRequest.quantity())
                 .expirationDate(inventoryRequest.expirationDate())
                 .status(LotStatus.ACTIVE)

@@ -46,7 +46,7 @@ public interface InventoryRepository extends JpaRepository<Inventory,Long> {
 
     List<Inventory> findByProductName(String name);
 
-    Optional<Inventory> findFirstByProductIdOrderByIdAsc(Long productId);
+    Optional<Inventory> findFirstByProductNameOrderByIdAsc(String name);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
