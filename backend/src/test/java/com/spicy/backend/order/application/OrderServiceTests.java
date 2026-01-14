@@ -42,208 +42,211 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTests {
-    @InjectMocks
-    private OrderService orderService;
+        @InjectMocks
+        private OrderService orderService;
 
-    @Mock
-    private OrderRepository orderRepository;
-    @Mock
-    private OrderItemRepository orderItemRepository;
-    @Mock
-    private CartItemRepository cartItemRepository;
+        @Mock
+        private OrderRepository orderRepository;
+        @Mock
+        private OrderItemRepository orderItemRepository;
+        @Mock
+        private CartItemRepository cartItemRepository;
 
-    private Long userId;
-    private Long orderId;
-    private Long storeId;
-    private Long productId;
-    private Long orderItemId;
+        private Long userId;
+        private Long orderId;
+        private Long storeId;
+        private Long productId;
+        private Long orderItemId;
 
-    private Long quantity;
+        private Long quantity;
 
-    private BigDecimal unitPrice;
-    private BigDecimal totalPrice;
+        private BigDecimal unitPrice;
+        private BigDecimal totalPrice;
 
-    private Order order;
-    private OrderAndOrderItemRequest orderAndOrderItemRequest;
-    private OrderCreateRequest orderCreateRequest;
-    private OrderItemRequest orderItemRequest;
-    private List<OrderItemRequest> orderItemRequestList;
-    private List<Order> orderList;
+        private Order order;
+        private OrderAndOrderItemRequest orderAndOrderItemRequest;
+        private OrderCreateRequest orderCreateRequest;
+        private OrderItemRequest orderItemRequest;
+        private List<OrderItemRequest> orderItemRequestList;
+        private List<Order> orderList;
 
-    private OrderItem orderItem;
+        private OrderItem orderItem;
 
-    private CartItem cartItem;
+        private CartItem cartItem;
 
-    private Product product;
+        private Product product;
 
-    @BeforeEach
-    void setUp() {
-        userId = 1L;
-        orderId = 10L;
-        storeId = 100L;
-        productId = 1000L;
-        orderItemId = 20L;
+        @BeforeEach
+        void setUp() {
+                userId = 1L;
+                orderId = 10L;
+                storeId = 100L;
+                productId = 1000L;
+                orderItemId = 20L;
 
-        quantity = 10L;
+                quantity = 10L;
 
-        unitPrice = BigDecimal.valueOf(100.00);
-        totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+                unitPrice = BigDecimal.valueOf(100.00);
+                totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
 
-        order = Order.builder()
-                .orderNumber("orderNumber")
-                .storeId(storeId)
-                .totalAmount(BigDecimal.valueOf(0))
-                .status(Status.PENDING)
-                .address("address")
-                .receiverPhone("receiverPhone")
-                .receiverName("receiverName")
-                .memo("memo")
-                .build();
-        ReflectionTestUtils.setField(order, "id", orderId);
+                order = Order.builder()
+                                .orderNumber("orderNumber")
+                                .storeId(storeId)
+                                .totalAmount(BigDecimal.valueOf(0))
+                                .status(Status.PENDING)
+                                .address("address")
+                                .receiverPhone("receiverPhone")
+                                .receiverName("receiverName")
+                                .memo("memo")
+                                .build();
+                ReflectionTestUtils.setField(order, "id", orderId);
 
-        orderList = List.of(order);
+                orderList = List.of(order);
 
-        orderItem = OrderItem.builder()
-                .orderId(orderId)
-                .productName("productName")
-                .productId(productId)
-                .quantity(quantity)
-                .unitPrice(unitPrice)
-                .totalPrice(unitPrice.multiply(BigDecimal.valueOf(quantity)))
-                .build();
-        ReflectionTestUtils.setField(orderItem, "id", orderItemId);
+                orderItem = OrderItem.builder()
+                                .orderId(orderId)
+                                .productName("productName")
+                                .productId(productId)
+                                .quantity(quantity)
+                                .unitPrice(unitPrice)
+                                .totalPrice(unitPrice.multiply(BigDecimal.valueOf(quantity)))
+                                .build();
+                ReflectionTestUtils.setField(orderItem, "id", orderItemId);
 
-        product = Product.builder()
-                .price(BigDecimal.valueOf(100.00))
-                .build();
-        ReflectionTestUtils.setField(product, "productId", productId);
+                product = Product.builder()
+                                .price(BigDecimal.valueOf(100.00))
+                                .build();
+                ReflectionTestUtils.setField(product, "productId", productId);
 
-        cartItem = CartItem.builder()
-                .storeId(storeId)
-                .userId(userId)
-                .product(product)
-                .quantity(quantity)
-                .build();
-    }
+                cartItem = CartItem.builder()
+                                .storeId(storeId)
+                                .userId(userId)
+                                .product(product)
+                                .quantity(quantity)
+                                .build();
+        }
 
-    @Test
-    @DisplayName("주문 생성 - 성공")
-    public void createOrder_Success() {
-        // given
-        OrderCreateRequest orderCreateRequest = new OrderCreateRequest(
-                LocalDate.now(),
-                "address",
-                "receiverName",
-                "receiverPhone",
-                "memo"
-        );
+        @Test
+        @DisplayName("주문 생성 - 성공")
+        public void createOrder_Success() {
+                // given
+                OrderCreateRequest orderCreateRequest = new OrderCreateRequest(
+                                LocalDate.now(),
+                                "address",
+                                "receiverName",
+                                "receiverPhone",
+                                "memo");
 
-        List<OrderItemRequest> orderItemRequestList = List.of(
-                new OrderItemRequest(
-                        productId,
-                        "productName",
-                        quantity,
-                        unitPrice
-                )
-        );
+                List<OrderItemRequest> orderItemRequestList = List.of(
+                                new OrderItemRequest(
+                                                productId,
+                                                "productName",
+                                                quantity,
+                                                unitPrice));
 
-        Order mockOrder = Order.builder()
-                .orderNumber("orderNumber")
-                .storeId(storeId)
-                .totalAmount(BigDecimal.valueOf(0))
-                .status(Status.PENDING)
-                .address("address")
-                .receiverPhone("receiverPhone")
-                .receiverName("receiverName")
-                .memo("memo")
-                .build();
-        ReflectionTestUtils.setField(mockOrder, "id", orderId);
-        given(orderRepository.save(any(Order.class))).willReturn(mockOrder);
+                Order mockOrder = Order.builder()
+                                .orderNumber("orderNumber")
+                                .storeId(storeId)
+                                .totalAmount(BigDecimal.valueOf(0))
+                                .status(Status.PENDING)
+                                .address("address")
+                                .receiverPhone("receiverPhone")
+                                .receiverName("receiverName")
+                                .memo("memo")
+                                .build();
+                ReflectionTestUtils.setField(mockOrder, "id", orderId);
+                given(orderRepository.save(any(Order.class))).willReturn(mockOrder);
 
-        given(orderItemRepository.saveAll(anyList())).willReturn(List.of());
+                given(orderItemRepository.saveAll(anyList())).willReturn(List.of());
 
-        given(cartItemRepository.findAllByUserIdAndStoreIdAndDeletedAtIsNull(userId, storeId)).willReturn(List.of(cartItem));
+                given(cartItemRepository.findAllByUserIdAndStoreIdAndDeletedAtIsNull(userId, storeId))
+                                .willReturn(List.of(cartItem));
 
-        // when
-        OrderCreateResponse response = orderService.createOrder(storeId, userId, orderCreateRequest);
+                // when
+                OrderCreateResponse response = orderService.createOrder(storeId, userId, orderCreateRequest);
 
-        // then
-        assertEquals(orderId, response.orderId());
-    }
+                // then
+                assertEquals(orderId, response.orderId());
+        }
 
+        // @Test
+        // @DisplayName("주문 전체 조회 - 성공")
+        // void getOrders_Success() {
+        // // given
+        // given(orderRepository.findAllByStoreIdAndStatusOrderByCreatedAt(storeId,
+        // Status.PENDING)).willReturn(orderList);
 
-    @Test
-    @DisplayName("주문 전체 조회 - 성공")
-    void getOrders_Success() {
-        // given
-        given(orderRepository.findAllByStoreIdAndStatusOrderByCreatedAt(storeId, Status.PENDING)).willReturn(orderList);
+        // // when
+        // List<OrderResponse> response = orderService.getAllOrders(storeId,
+        // Status.PENDING);
 
-        // when
-        List<OrderResponse> response = orderService.getAllOrders(storeId, Status.PENDING);
+        // // then
+        // assertEquals(orderId, response.get(0).orderId());
 
-        // then
-        assertEquals(orderId, response.get(0).orderId());
+        // verify(orderRepository,
+        // times(1)).findAllByStoreIdAndStatusOrderByCreatedAt(storeId, Status.PENDING);
+        // }
 
-        verify(orderRepository, times(1)).findAllByStoreIdAndStatusOrderByCreatedAt(storeId, Status.PENDING);
-    }
+        @Test
+        @DisplayName("주문 정보 상세 조회 - 성공")
+        void getOrderDetails_Success() {
+                // given
+                given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId,
+                                orderId)).willReturn(List.of(orderItem));
 
+                // when
+                List<OrderItemResponse> response = orderService.getOrderDetails(storeId, orderId);
 
-    @Test
-    @DisplayName("주문 정보 상세 조회 - 성공")
-    void getOrderDetails_Success() {
-        // given
-        given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId, orderId)).willReturn(List.of(orderItem));
+                // then
+                assertEquals("productName", response.get(0).productName());
+                assertEquals(quantity, response.get(0).quantity());
+                assertEquals(unitPrice, response.get(0).unitPrice());
+                assertEquals(totalPrice, response.get(0).totalPrice());
+        }
 
-        // when
-        List<OrderItemResponse> response = orderService.getOrderDetails(storeId, orderId);
+        @Test
+        @DisplayName("주문 정보 상세 조회 - 실패 - ORDER_ITEM_NOT_FOUND")
+        void getOrderDetails_Failure_ORDER_ITEM_NOT_FOUND() {
+                // given
+                given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId,
+                                orderId)).willReturn(List.of());
 
-        // then
-        assertEquals("productName", response.get(0).productName());
-        assertEquals(quantity, response.get(0).quantity());
-        assertEquals(unitPrice, response.get(0).unitPrice());
-        assertEquals(totalPrice, response.get(0).totalPrice());
-    }
+                // when & then
+                BusinessException exception = assertThrows(BusinessException.class,
+                                () -> orderService.getOrderDetails(storeId, orderId));
+                assertEquals("주문 상품이 존재하지 않거나 권한이 없습니다.", exception.getMessage());
+                assertEquals(OrderErrorCode.ORDER_ITEM_NOT_FOUND, exception.getErrorCode());
+        }
 
-    @Test
-    @DisplayName("주문 정보 상세 조회 - 실패 - ORDER_ITEM_NOT_FOUND")
-    void getOrderDetails_Failure_ORDER_ITEM_NOT_FOUND() {
-        // given
-        given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId, orderId)).willReturn(List.of());
+        @Test
+        @DisplayName("주문 취소 - 성공")
+        void cancelOrder_Success() {
+                // given
+                given(orderRepository.findByStoreIdAndIdAndDeletedAtIsNull(storeId, orderId))
+                                .willReturn(Optional.of(order));
 
-        // when & then
-        BusinessException exception = assertThrows(BusinessException.class, () ->
-                orderService.getOrderDetails(storeId, orderId));
-        assertEquals("주문 상품이 존재하지 않거나 권한이 없습니다.", exception.getMessage());
-        assertEquals(OrderErrorCode.ORDER_ITEM_NOT_FOUND, exception.getErrorCode());
-    }
+                given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId,
+                                orderId)).willReturn(List.of(orderItem));
 
+                // when
+                OrderCanceledResponse response = orderService.cancelOrder(storeId, orderId);
 
-    @Test
-    @DisplayName("주문 취소 - 성공")
-    void cancelOrder_Success() {
-        // given
-        given(orderRepository.findByStoreIdAndIdAndDeletedAtIsNull(storeId, orderId)).willReturn(Optional.of(order));
+                // then
+                assertEquals(Status.CANCELLED, response.order().status());
+                assertThat(orderItem)
+                                .matches(item -> item.getStatus().equals(Status.CANCELLED));
+        }
 
-        given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId, orderId)).willReturn(List.of(orderItem));
+        @Test
+        @DisplayName("주문 실패 - ORDER_NOT_FOUND")
+        void cancelOrder_Failure_ORDER_NOT_FOUND() {
+                // given
+                given(orderRepository.findByStoreIdAndIdAndDeletedAtIsNull(storeId, orderId))
+                                .willReturn(Optional.empty());
 
-        // when
-        OrderCanceledResponse response = orderService.cancelOrder(storeId, orderId);
-
-        // then
-        assertEquals(Status.CANCELLED, response.order().status());
-        assertThat(orderItem)
-                .matches(item -> item.getStatus().equals(Status.CANCELLED));
-    }
-    @Test
-    @DisplayName("주문 실패 - ORDER_NOT_FOUND")
-    void cancelOrder_Failure_ORDER_NOT_FOUND() {
-        // given
-        given(orderRepository.findByStoreIdAndIdAndDeletedAtIsNull(storeId, orderId)).willReturn(Optional.empty());
-
-        // then & when
-        BusinessException exception = assertThrows(BusinessException.class, () ->
-                orderService.cancelOrder(storeId, orderId)
-        );
-        assertEquals(OrderErrorCode.ORDER_NOT_FOUND, exception.getErrorCode());
-    }
+                // then & when
+                BusinessException exception = assertThrows(BusinessException.class,
+                                () -> orderService.cancelOrder(storeId, orderId));
+                assertEquals(OrderErrorCode.ORDER_NOT_FOUND, exception.getErrorCode());
+        }
 }

@@ -6,14 +6,14 @@ import com.spicy.backend.order.domain.Product;
 import java.util.List;
 
 public record CartItemResponse(
+        Long cartItemId,
         Product product,
-        Long quantity
-) {
+        Long quantity) {
     public static CartItemResponse from(CartItem cartItem) {
         return new CartItemResponse(
+                cartItem.getId(),
                 cartItem.getProduct(),
-                cartItem.getQuantity()
-        );
+                cartItem.getQuantity());
     }
 
     public static List<CartItemResponse> from(List<CartItem> cartItems) {

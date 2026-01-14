@@ -21,6 +21,9 @@ const handleSearch = (e) => {
         <input type="text" placeholder="어떤 상품을 찾으시나요?" @input="handleSearch" />
       </div>
       <div class="main-btns">
+        <button class="btn-order action-btn" @click="$emit('request-inbound')">
+          <span>📦 주문하기</span>
+        </button>
         <button class="btn-spicy action-btn" @click="$emit('request-inbound')">
           <span>🌶️ 입고하기</span>
         </button>
@@ -61,7 +64,10 @@ const handleSearch = (e) => {
 
           <div class="card-footer">
             <div class="p-price">₩{{ p.price?.toLocaleString() || '0' }}</div>
-            <button class="detail-link">🔍 상세보기</button>
+            <div class="card-footer-actions">
+              <button class="order-link" @click.stop="$emit('request-inbound', p.productName)">📦 주문</button>
+              <button class="detail-link">🔍 상세보기</button>
+            </div>
           </div>
         </div>
 
@@ -211,7 +217,27 @@ const handleSearch = (e) => {
 }
 
 .p-price { font-weight: 900; color: var(--spicy-red); font-size: 1.15rem; }
+.card-footer-actions { display: flex; gap: 0.75rem; align-items: center; }
+.order-link { background: #fdf2f2; border: 1.5px solid var(--spicy-red); color: var(--spicy-red); padding: 0.35rem 0.75rem; border-radius: 10px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+.order-link:hover { background: var(--spicy-red); color: white; }
 .detail-link { background: none; border: none; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+
+.btn-order {
+  padding: 0 1.75rem;
+  height: 60px;
+  border-radius: 16px;
+  border: 2px solid var(--spicy-red);
+  background: white;
+  color: var(--spicy-red);
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-order:hover {
+  background: #fdf2f2;
+  transform: translateY(-2px);
+}
 
 .loading-state, .empty-state {
   grid-column: 1 / -1;

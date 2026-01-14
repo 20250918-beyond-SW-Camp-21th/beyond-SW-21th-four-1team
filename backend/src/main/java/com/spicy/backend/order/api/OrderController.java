@@ -33,9 +33,8 @@ public class OrderController {
     @PostMapping("/{user-id}/{store-id}")
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
             @PathVariable("user-id") Long userId,
-            @PathVariable("store-id") Long storeId,   // 가맹점 식별 번호
-            @RequestBody OrderCreateRequest request
-    ) {
+            @PathVariable("store-id") Long storeId, // 가맹점 식별 번호
+            @RequestBody OrderCreateRequest request) {
         return ResponseEntity.ok(ApiResponse.success(orderService.createOrder(storeId, userId, request)));
     }
 
@@ -43,9 +42,8 @@ public class OrderController {
     @Operation(summary = "주문 조회", description = "가맹점주의 요청에 따라 전체, 완료, 취소된 주문 조회")
     @GetMapping("/{status}/{store-id}")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrders(
-            @PathVariable("store-id") Long storeId,   // 가맹점 식별 번호
-            @PathVariable Status status
-    ) {
+            @PathVariable("store-id") Long storeId, // 가맹점 식별 번호
+            @PathVariable Status status) {
         return ResponseEntity.ok(ApiResponse.success(orderService.getAllOrders(storeId, status)));
     }
 
@@ -54,8 +52,7 @@ public class OrderController {
     @GetMapping("/{store-id}/{order-id}/details")
     public ResponseEntity<ApiResponse<List<OrderItemResponse>>> getOrderDetails(
             @PathVariable("store-id") Long storeId,
-            @PathVariable("order-id") Long orderId
-    ) {
+            @PathVariable("order-id") Long orderId) {
         return ResponseEntity.ok(ApiResponse.success(orderService.getOrderDetails(storeId, orderId)));
     }
 
@@ -63,9 +60,8 @@ public class OrderController {
     @Operation(summary = "주문 취소", description = "가맹점주가 생성했던 주문 중 요청받은 건들에 대해 취소를 진행")
     @PatchMapping("/{store-id}/{order-id}")
     public ResponseEntity<ApiResponse<OrderCanceledResponse>> cancelOrders(
-            @PathVariable("store-id") Long storeId,   // 가맹점 식별 번호
-            @PathVariable("order-id") Long orderId
-    ) {
+            @PathVariable("store-id") Long storeId, // 가맹점 식별 번호
+            @PathVariable("order-id") Long orderId) {
 
         return ResponseEntity.ok(ApiResponse.success(orderService.cancelOrder(storeId, orderId)));
     }

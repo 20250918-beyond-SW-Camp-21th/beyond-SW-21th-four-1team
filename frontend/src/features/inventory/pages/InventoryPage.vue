@@ -1,10 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { inventoryApi } from '../api/inventoryApi';
 import InventoryList from '../components/InventoryList.vue';
 import InventoryDetail from '../components/InventoryDetail.vue';
 import InboundModal from '../components/InboundModal.vue';
 import OutboundModal from '../components/OutboundModal.vue';
+
+const router = useRouter();
 
 // State
 const viewMode = ref('list'); 
@@ -109,6 +112,10 @@ const handleOutboundConfirm = async (data) => {
   }
 };
 
+const goToProductOrder = () => {
+  router.push('/products');
+};
+
 const handleLogout = () => {
   // Placeholder for future logout logic (e.g., clearing tokens)
   if (confirm('정말 주방에서 퇴근하시겠습니까? 👩‍🍳')) {
@@ -130,6 +137,8 @@ onMounted(loadProducts);
         </div>
         <div class="nav-links">
           <span class="user-info">어서오세요, 셰프님! 👩‍🍳</span>
+          <button class="order-status-btn" @click="router.push('/orders')">주문 현황 확인</button>
+          <button class="cart-btn" @click="router.push('/cart')">장바구니 확인</button>
           <button class="logout-btn" @click="handleLogout">퇴근하기</button>
         </div>
       </div>
@@ -154,7 +163,7 @@ onMounted(loadProducts);
           :products="products" 
           :loading="loading"
           @view-detail="openDetail"
-          @request-inbound="openInboundRequest"
+          @request-inbound="goToProductOrder"
           @request-outbound="openOutboundRequest"
           @search="handleSearch"
         />
@@ -240,6 +249,38 @@ onMounted(loadProducts);
   border-radius: 99px 0 0 99px;
   border: 1px solid var(--border-color);
   border-right: none;
+}
+
+.order-status-btn {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--deep-brown);
+  background: var(--border-color);
+  padding: 0.4rem 1.2rem;
+  border: 1px solid var(--border-color);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.order-status-btn:hover {
+  background: #fde68a;
+}
+
+.cart-btn {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--deep-brown);
+  background: var(--border-color);
+  padding: 0.4rem 1.2rem;
+  border: 1px solid var(--border-color);
+  border-left: 1px solid rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cart-btn:hover {
+  background: #fde68a;
 }
 
 .logout-btn {

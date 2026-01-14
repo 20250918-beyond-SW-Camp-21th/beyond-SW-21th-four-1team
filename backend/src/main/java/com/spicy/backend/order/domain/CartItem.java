@@ -41,6 +41,5 @@ public class CartItem extends BaseEntity {
 
     // 수량
     @Column(nullable = false)
-    @Size(min = 1)
     private Long quantity;
 }
