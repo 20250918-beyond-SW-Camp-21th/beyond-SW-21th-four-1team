@@ -90,6 +90,11 @@ public class SettlementService {
     @Transactional
     public void createSettlement(Long storeId, LocalDate targetDate) {
 
+        // 중복 체크
+        if (settlementRepository.findByStoreIdAndSettlementDate(storeId, targetDate).isPresent()) {
+            throw new BusinessException(SettlementErrorCode.SETTLEMENT_ALREADY_EXISTS);
+        }
+
         java.time.LocalDateTime startOfDay = targetDate.atStartOfDay();
         java.time.LocalDateTime endOfDay = targetDate.atTime(java.time.LocalTime.MAX);
 

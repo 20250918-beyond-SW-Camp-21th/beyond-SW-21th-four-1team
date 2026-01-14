@@ -16,11 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDate;
 
 @Tag(name = "Settlement", description = "정산 API (일별/월별 조회)")
 @RestController
@@ -82,10 +80,9 @@ public class SettlementController {
     @Operation(summary = "일일 정산 생성")
     @PostMapping("/generate")
     public ResponseEntity<Void> createSettlement(
-            @RequestParam Long storeId,
-            @RequestParam LocalDate date
+            @Valid @RequestBody DailySettlementRequest request
     ) {
-        settlementService.createSettlement(storeId, date);
+        settlementService.createSettlement(request.storeId(), request.date());
         return ResponseEntity.ok().build();
     }
 
