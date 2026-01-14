@@ -30,7 +30,7 @@ public class SettlementFileService {
                 HtmlConverter.convertToPdf(htmlContent, target);
 
                 // 로그 메시지 변경 (URL 반환 -> PDF 데이터 반환)
-                log.info("PDF 생성 완료: totalAmount={}, size={}, bytes",
+                log.info("PDF 생성 완료: totalAmount={}, size={} bytes",
                         data.totalAmount(), target.size());
 
                 //실제 생성된 PDF 파일 데이터(byte[])를 반환
