@@ -18,4 +18,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByStoreIdAndIdAndDeletedAtIsNull(Long storeId, Long orderId);
 
     List<Order> findAllByStoreIdAndCreatedAtBetween(Long storeId, LocalDateTime start, LocalDateTime end);
+
+    List<Order> findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(
+            Long storeId,
+            Status status, // Status.COMPLETED 등을 넘기기 위해 추가
+            LocalDateTime start,
+            LocalDateTime end
+    );
 }

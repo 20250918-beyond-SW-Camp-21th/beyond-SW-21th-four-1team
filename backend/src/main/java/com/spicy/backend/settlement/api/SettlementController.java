@@ -79,8 +79,8 @@ public class SettlementController {
                 .body(pdfFile);
     }
 
-    @Operation(summary = "일일 정산 생성") // 이게 있을 수도 있고 없을 수도 있음
-    @PostMapping("/generate")            // 핵심은 이 줄입니다!
+    @Operation(summary = "일일 정산 생성")
+    @PostMapping("/generate")
     public ResponseEntity<Void> createSettlement(
             @RequestParam Long storeId,
             @RequestParam LocalDate date
