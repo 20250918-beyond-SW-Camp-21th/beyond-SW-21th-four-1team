@@ -93,7 +93,12 @@ public class SettlementService {
         java.time.LocalDateTime startOfDay = targetDate.atStartOfDay();
         java.time.LocalDateTime endOfDay = targetDate.atTime(java.time.LocalTime.MAX);
 
-        List<Order> orders = orderRepository.findAllByStoreIdAndCreatedAtBetween(storeId, startOfDay, endOfDay);
+        List<Order> orders = orderRepository.findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(
+                storeId,
+                com.spicy.backend.order.enums.Status.DELIVERED, // 또는 상황에 맞는 '완료' 상태
+                startOfDay,
+                endOfDay
+        );
 
         int count = orders.size();
 
