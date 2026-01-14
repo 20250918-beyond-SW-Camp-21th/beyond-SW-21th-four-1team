@@ -89,25 +89,28 @@ public class SettlementService {
 
     @Transactional
     public void createSettlement(Long storeId, LocalDate targetDate) {
-        // 1. 해당 가게의 해당 날짜 주문 다 가져오기
-        List<Order> orders = orderRepository.findAllByStoreIdAndDate(storeId, targetDate);
 
-        // 2. 계산하기
+        java.time.LocalDateTime startOfDay = targetDate.atStartOfDay();
+        java.time.LocalDateTime endOfDay = targetDate.atTime(java.time.LocalTime.MAX);
+
+        List<Order> orders = orderRepository.findAllByStoreIdAndCreatedAtBetween(storeId, startOfDay, endOfDay);
+
+        int count = orders.size();
+
         BigDecimal totalAmount = orders.stream().map(Order::getTotalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal commission = totalAmount.multiply(new BigDecimal("0.05")); // 예: 수수료 5%
         BigDecimal settleAmount = totalAmount.subtract(commission);
 
-        // 3. 엔티티 만들기
         Settlement settlement = Settlement.builder()
                 .storeId(storeId)
                 .settlementDate(targetDate)
                 .totalOrderAmount(totalAmount)
                 .commissionAmount(commission)
                 .settlementAmount(settleAmount)
+                .orderCount(count)
                 .status(SettlementStatus.WAITING)
                 .build();
 
-        // 4. 저장! (이게 없어서 DB에 없었던 것)
         settlementRepository.save(settlement);
     }
 }
