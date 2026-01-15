@@ -9,6 +9,10 @@ public record MonthlySettlementRequest(
         Long storeId,
 
         @NotNull
+        @Schema(description = "상품 식별 번호",example = "1")
+        Long productId,
+
+        @NotNull
         @Schema(description = "조회 연월(YYYY-MM)", example = "2026-01", type = "string")
         String yearMonth
 ) {

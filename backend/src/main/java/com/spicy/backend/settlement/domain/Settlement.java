@@ -83,4 +83,8 @@ public class Settlement extends BaseEntity {
     @NotNull
     private SettlementStatus status;
 
+    // 상품 ID
+    @Column(nullable = false)
+    private Long productId;
+
 }

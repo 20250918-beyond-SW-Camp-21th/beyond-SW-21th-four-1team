@@ -33,20 +33,15 @@ public class DemandPlanService {
     private String createRecommendationMessage(Long productId) {
 
         // 최근 한달 간 재고 파악 후 권장 수량 계산 로직
-        List<Integer> sales = infoProvider.getRecentOrderCount(productId, 1);
+        Integer salesObj = infoProvider.getRecentOrderCount(productId, 1);
+        int sales = (salesObj == null) ? 0 : Math.max(0, salesObj);
 
         // sales 리스트 null 체크 로직
-        if(sales == null || sales.isEmpty()) {
-
+        if(sales == 0) {
             // 기간을 늘려 재탐색
-            sales = infoProvider.getRecentOrderCount(productId, 3);
-
+            Integer salesExtendedObj = infoProvider.getRecentOrderCount(productId, 3);
+            sales = (salesExtendedObj == null) ? 0 : Math.max(0, salesExtendedObj);
         }
-
-        // 최근 기간 총 재고 주문 수량
-        int totalSales = sales
-                .stream()
-                .mapToInt(i -> i).sum();
 
         // 추천 수량
         int recommended;
@@ -54,12 +49,12 @@ public class DemandPlanService {
         String prefix;
 
         // 최근 한달 간 재고 주문 수량이 0건인 경우 로직
-        if(totalSales == 0) {
+        if(sales == 0) {
             recommended = DEFAULT_MIN_ORDER_COUNT;
             prefix = "최근 주문이 없습니다. ";
         } else {
             // 최근 한달의 총 매출과 안전 수량 배율 상수를 곱연산하여 계산(배율 조정 가능)
-            recommended = (int) (totalSales * SAFETY_STOCK_RATE);
+            recommended = (int) (sales * SAFETY_STOCK_RATE);
             prefix = "최근 주문 수량 기준 ";
         }
         return prefix + "추천 권장 수량은 " + recommended + "개 입니다.";

@@ -19,8 +19,8 @@ public class SettlementCustomRepositoryImpl implements SettlementCustomRepositor
             return;
         }
         String sql = "INSERT INTO settlement (store_id, settlement_date, order_count, total_order_amount, " +
-                "commission_amount, settlement_amount, status, created_at, updated_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+                "commission_amount, settlement_amount, status, created_at, updated_at, product_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)";
 
         jdbcTemplate.batchUpdate(sql, settlements, 1000, (ps, settlement) -> {
             ps.setObject(1, settlement.getStoreId());
@@ -30,6 +30,7 @@ public class SettlementCustomRepositoryImpl implements SettlementCustomRepositor
             ps.setBigDecimal(5, settlement.getCommissionAmount());
             ps.setBigDecimal(6, settlement.getSettlementAmount());
             ps.setString(7, settlement.getStatus().name());
+            ps.setLong(8,settlement.getProductId());
         });
     }
 }

@@ -9,6 +9,9 @@ import java.time.LocalDate;
 
 @Builder
 public record MonthlySettlementResponse(
+        @Schema(description = "상품 식별 번호", example = "1")
+        Long productId,
+
         @Schema(description = "해당 월 주문 금액 합계", example = "5000000.00")
         BigDecimal totalAmount,
 
