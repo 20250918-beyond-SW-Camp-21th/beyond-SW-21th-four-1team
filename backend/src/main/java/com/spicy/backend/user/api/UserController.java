@@ -38,12 +38,12 @@ public class UserController {
     }
 
     @Operation(summary = "특정 회원 조회", description = "HQ 권한을 가진 관리자만 특정 회원의 정보를 조회할 수 있다.")
-    @GetMapping("/{userId}")
+    @GetMapping("/{userLoginId}")
     @PreAuthorize("hasRole('HQ')")
     public ResponseEntity<ApiResponse<UserHQViewResponse>> getUser(
-            @PathVariable Long userId
+            @PathVariable String userLoginId
     ) {
-        UserHQViewResponse response = userService.getUser(userId);
+        UserHQViewResponse response = userService.getUser(userLoginId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

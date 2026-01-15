@@ -8,7 +8,7 @@ import com.spicy.backend.user.dto.response.UserHQViewResponse;
 public interface UserService {
 
     MyInfoResponse getMe(Long userId);
-    UserHQViewResponse getUser(Long userId);
+    UserHQViewResponse getUser(String userLoginId);
     void updateMe(Long userId, UpdateMyInfoRequest request);
     void updatePassword(Long userId, UpdatePasswordRequest request);
     void withdraw(Long userId);
