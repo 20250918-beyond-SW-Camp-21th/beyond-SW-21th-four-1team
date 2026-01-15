@@ -3,6 +3,8 @@ import InventoryPage from '../features/inventory/pages/InventoryPage.vue'
 import ProductListView from '../features/order/ProductListView.vue'
 import CartListView from '../features/order/CartListView.vue'
 import OrderListView from '../features/order/OrderListView.vue'
+import MonthlySettlement from '../features/settlement/pages/MonthlySettlement.vue'
+import DailySettlement from '../features/settlement/pages/DailySettlement.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +35,20 @@ const router = createRouter({
             path: '/orders',
             name: 'orders',
             component: OrderListView
+        },
+        {
+            path: '/settlements',
+            redirect: '/settlements/daily'
+        },
+        {
+            path: '/settlements/daily',
+            name: 'DailySettlement',
+            component: DailySettlement
+        },
+        {
+            path: '/settlements/monthly',
+            name: 'MonthlySettlement',
+            component: MonthlySettlement
         }
     ]
 })
