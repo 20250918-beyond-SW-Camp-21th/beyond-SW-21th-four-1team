@@ -5,7 +5,6 @@ import com.spicy.backend.demandplan.controller.dto.response.StockResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class DemandPlanService {
         if(sales == 0) {
             // 기간을 늘려 재탐색
             Integer salesExtendedObj = infoProvider.getRecentOrderCount(productId, 3);
-            sales = (salesExtendedObj == null) ? 0 : Math.max(0, salesExtendedObj);
+            sales = (salesExtendedObj == null) ? 0 : Math.max(0, salesExtendedObj/2);
         }
 
         // 추천 수량

@@ -3,16 +3,16 @@ import { ref, defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
   isOpen: Boolean,
-  prefilledProductId: {
-    type: Number,
-    default: null
+  prefilledProductName: {
+    type: String,
+    default: ''
   }
 });
 
 const emit = defineEmits(['close', 'confirm']);
 
 const formData = ref({
-  id: props.prefilledProductId || '',
+  name: props.prefilledProductName || '',
   quantity: 1,
   monthsUntilExpiration: 3
 });
@@ -32,12 +32,12 @@ const handleSubmit = () => {
 
       <form @submit.prevent="handleSubmit" class="modal-body">
         <div class="form-group">
-          <label>상품 ID</label>
+          <label>상품 이름</label>
           <input 
-            type="number" 
-            v-model="formData.id" 
-            placeholder="상품 ID 입력"
-            :disabled="!!prefilledProductId"
+            type="text" 
+            v-model="formData.name" 
+            placeholder="상품 이름 입력"
+            :disabled="!!prefilledProductName"
             required
           />
         </div>
