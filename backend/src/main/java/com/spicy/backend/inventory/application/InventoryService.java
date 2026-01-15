@@ -34,10 +34,10 @@ public class InventoryService {
     final private MinimumProductRepository minimumProductRepository;
 
     public ProductResponse getAllProduct() {
-        //유통기한 업데이트
+        // 유통기한 업데이트
         updateExpiredInventoryStatus();
 
-        //인벤토리에 있는 InventoryLotResponse형태로 다 가져오기
+        // 인벤토리에 있는 InventoryLotResponse형태로 다 가져오기
         List<InventoryLotResponse> inventoryLotResponses = inventoryRepository.findAllProduct();
 
         // 없으면 예외처리
@@ -52,12 +52,12 @@ public class InventoryService {
         for (InventoryLotResponse inventoryLotResponse : inventoryLotResponses) {
             Long id = inventoryLotResponse.productId();
 
-            //해쉬맵에 해당하는 id가 없을 경우 id값과 배열 선언
+            // 해쉬맵에 해당하는 id가 없을 경우 id값과 배열 선언
             if (!inventories.containsKey(id)) {
                 inventories.put(id, new ArrayList());
             }
 
-            //해당 id값에 상품 리스트 넣기
+            // 해당 id값에 상품 리스트 넣기
             inventories.get(id).add(inventoryLotResponse);
 
         }
@@ -78,7 +78,7 @@ public class InventoryService {
         // 해쉬맵에서 값 꺼내기
         for (Map.Entry<Long, List<InventoryLotResponse>> entry : inventories.entrySet()) {
             Long id = entry.getKey();
-            //id에 알맞은 기본 정보를 꺼내옴
+            // id에 알맞은 기본 정보를 꺼내옴
             ProductBaseInfo productBaseInfo = baseInfoMap.get(id);
 
             if (productBaseInfo == null) {
@@ -87,7 +87,9 @@ public class InventoryService {
             // 총 수량 계산
             int totalQuantity = 0;
             for (InventoryLotResponse inventoryLotResponse : entry.getValue()) {
-                totalQuantity += inventoryLotResponse.quantity();
+                // 활성화 된 재고만 총 수량에 넣기
+                if (inventoryLotResponse.status() == LotStatus.ACTIVE)
+                    totalQuantity += inventoryLotResponse.quantity();
             }
 
             List<InventoryLotResponse> productLotResponses = entry.getValue();
@@ -97,12 +99,10 @@ public class InventoryService {
                     productBaseInfo.price(),
                     productBaseInfo.minimumQuantity(),
                     totalQuantity,
-                    productLotResponses
-            ));
+                    productLotResponses));
         }
 
         return new ProductResponse(productSummaries);
-
 
     }
 
@@ -116,20 +116,21 @@ public class InventoryService {
             throw new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND);
         }
         // 해당하는 상품 최소 수량 가져오기(지금은 가맹점 하나로 치므로 1L로 고정)
-        MinimumProduct minimumProducts = minimumProductRepository.findByProductIdAndStoreId(id,DEFAULT_STORE_ID)
+        MinimumProduct minimumProducts = minimumProductRepository.findByProductIdAndStoreId(id, DEFAULT_STORE_ID)
                 .orElseThrow(() -> new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND));
         List<InventoryLotResponse> productLotResponses = new ArrayList<>();
         int totalQuantity = 0;
 
         for (Inventory inventory : inventories) {
-            totalQuantity += inventory.getQuantity();
+            if (inventory.getStatus() == LotStatus.ACTIVE) {
+                totalQuantity += inventory.getQuantity();
+            }
             productLotResponses.add(new InventoryLotResponse(
                     inventory.getProductId(),
                     inventory.getQuantity(),
                     inventory.getExpirationDate(),
                     inventory.getStatus(),
-                    inventory.getProductCode()
-            ));
+                    inventory.getProductCode()));
         }
         return new ProductSummaryResponse(
                 inventories.get(0).getProductId(),
@@ -137,12 +138,11 @@ public class InventoryService {
                 inventories.get(0).getPrice(),
                 minimumProducts.getMinimumQuantity(),
                 totalQuantity,
-                productLotResponses
-        );
+                productLotResponses);
     }
 
     public ProductSummaryResponse searchByName(String name) {
-        //유통기한 업데이트
+        // 유통기한 업데이트
         updateExpiredInventoryStatus();
 
         List<Inventory> inventories = inventoryRepository.findByProductName(name);
@@ -152,20 +152,21 @@ public class InventoryService {
         }
         Long id = inventories.stream().findFirst().get().getProductId();
         // 해당하는 상품 최소 수량 가져오기(지금은 가맹점 하나로 치므로 1L로 고정)
-        MinimumProduct minimumProducts = minimumProductRepository.findByProductIdAndStoreId(id,DEFAULT_STORE_ID)
+        MinimumProduct minimumProducts = minimumProductRepository.findByProductIdAndStoreId(id, DEFAULT_STORE_ID)
                 .orElseThrow(() -> new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND));
         List<InventoryLotResponse> productLotResponses = new ArrayList<>();
         int totalQuantity = 0;
 
         for (Inventory inventory : inventories) {
-            totalQuantity += inventory.getQuantity();
+            if (inventory.getStatus() == LotStatus.ACTIVE) {
+                totalQuantity += inventory.getQuantity();
+            }
             productLotResponses.add(new InventoryLotResponse(
                     inventory.getProductId(),
                     inventory.getQuantity(),
                     inventory.getExpirationDate(),
                     inventory.getStatus(),
-                    inventory.getProductCode()
-            ));
+                    inventory.getProductCode()));
         }
         return new ProductSummaryResponse(
                 inventories.get(0).getProductId(),
@@ -173,8 +174,7 @@ public class InventoryService {
                 inventories.get(0).getPrice(),
                 minimumProducts.getMinimumQuantity(),
                 totalQuantity,
-                productLotResponses
-        );
+                productLotResponses);
     }
 
     public Void inbound(@Valid InventoryRequest inventoryRequest) {
@@ -222,7 +222,6 @@ public class InventoryService {
 
         return null;
     }
-
 
     public void updateExpiredInventoryStatus() {
         LocalDate today = LocalDate.now();
