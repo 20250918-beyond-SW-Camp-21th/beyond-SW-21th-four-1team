@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { getMe, updateMe, updatePassword, withdraw } from '@/api/user.js';
+import { logout } from '@/api/auth.js';
 
 const router = useRouter();
 const user = ref(null);
@@ -71,8 +72,19 @@ const handleChangePassword = async () => {
     try {
         const response = await updatePassword(pwForm.value.oldPassword, pwForm.value.newPassword);
         if (response.success) {
-            alert('비밀번호가 안전하게 변경되었습니다! 🔒');
-            pwForm.value = { oldPassword: '', newPassword: '' };
+            alert('비밀번호가 안전하게 변경되었습니다! 보안을 위해 다시 로그인해주세요. 🔒');
+            
+            try {
+                const refreshToken = localStorage.getItem('refreshToken');
+                if (refreshToken) {
+                    await logout(refreshToken);
+                }
+            } catch (logoutError) {
+                console.error('Logout failed after password change:', logoutError);
+            } finally {
+                localStorage.clear();
+                router.push('/login');
+            }
         } else {
             passwordError.value = response.error || '변경 실패';
         }
