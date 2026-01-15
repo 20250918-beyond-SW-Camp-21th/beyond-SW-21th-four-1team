@@ -65,14 +65,14 @@ class UserServiceImplTest {
     void getUser_success() {
 
         // given
-        Long targetUserId = 2L;
+        String targetUserId = "loginId";
         User targetUser = User.builder()
-                .id(targetUserId)
+                .loginId(targetUserId)
                 .username("가맹점주")
                 .email("franchise@test.com")
                 .build();
 
-        given(userRepository.findById(targetUserId)).willReturn(Optional.of(targetUser));
+        given(userRepository.findByLoginId(targetUserId)).willReturn(Optional.of(targetUser));
 
         // when
         UserHQViewResponse response = userService.getUser(targetUserId);

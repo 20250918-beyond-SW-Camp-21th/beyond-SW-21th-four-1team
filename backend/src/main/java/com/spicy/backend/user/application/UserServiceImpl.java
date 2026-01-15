@@ -35,9 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserHQViewResponse getUser(Long userId) {
+    public UserHQViewResponse getUser(String userLoginId) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByLoginId(userLoginId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         return UserHQViewResponse.from(user);
