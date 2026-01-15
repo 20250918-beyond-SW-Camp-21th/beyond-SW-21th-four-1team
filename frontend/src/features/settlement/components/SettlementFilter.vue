@@ -15,6 +15,7 @@ const emit = defineEmits(['filter-change']);
 const storeId = ref(1);
 const selectedDate = ref(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
 const selectedMonth = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
+const selectedStatus = ref('ALL'); // ALL, WAITING, CONFIRMED, COMPLETED
 
 const handleFilter = () => {
   if (props.mode === 'daily') {
@@ -25,13 +26,14 @@ const handleFilter = () => {
   } else {
     emit('filter-change', {
       storeId: storeId.value,
-      yearMonth: selectedMonth.value
+      yearMonth: selectedMonth.value,
+      status: selectedStatus.value
     });
   }
 };
 
 // Auto-trigger on mount
-watch([storeId, selectedDate, selectedMonth], () => {
+watch([storeId, selectedDate, selectedMonth, selectedStatus], () => {
   handleFilter();
 }, { immediate: true });
 </script>
@@ -65,15 +67,31 @@ watch([storeId, selectedDate, selectedMonth], () => {
         />
       </div>
 
-      <div v-else class="filter-group">
-        <label for="month">조회 월</label>
-        <input 
-          id="month"
-          v-model="selectedMonth" 
-          type="month"
-          :max="new Date().toISOString().slice(0, 7)"
-        />
-      </div>
+      <template v-else>
+        <div class="filter-group">
+          <label for="month">조회 월</label>
+          <input 
+            id="month"
+            v-model="selectedMonth" 
+            type="month"
+            :max="new Date().toISOString().slice(0, 7)"
+          />
+        </div>
+
+        <div class="filter-group">
+          <label for="status">정산 상태</label>
+          <select 
+            id="status"
+            v-model="selectedStatus"
+            class="status-select"
+          >
+            <option value="ALL">전체</option>
+            <option value="WAITING">대기</option>
+            <option value="CONFIRMED">확정</option>
+            <option value="COMPLETED">지급 완료</option>
+          </select>
+        </div>
+      </template>
 
       <button class="btn-spicy filter-btn" @click="handleFilter">
         <span>🌶️ 조회하기</span>
@@ -141,6 +159,28 @@ watch([storeId, selectedDate, selectedMonth], () => {
   outline: none;
   border-color: var(--spicy-red);
   box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.1);
+}
+
+.status-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--deep-brown);
+  background: white;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: var(--spicy-red);
+  box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.1);
+}
+
+.status-select:hover {
+  border-color: var(--sauce-orange);
 }
 
 .filter-btn {

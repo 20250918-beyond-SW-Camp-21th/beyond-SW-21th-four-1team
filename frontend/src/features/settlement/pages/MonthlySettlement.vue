@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { settlementApi } from '../api/settlementApi';
 import SettlementFilter from '../components/SettlementFilter.vue';
@@ -13,7 +13,8 @@ const loading = ref(false);
 const error = ref(null);
 const currentFilters = ref({ 
   storeId: 1, 
-  yearMonth: new Date().toISOString().slice(0, 7) 
+  yearMonth: new Date().toISOString().slice(0, 7),
+  status: 'ALL'
 });
 
 const loadMonthlySettlement = async (filters) => {
@@ -31,6 +32,19 @@ const loadMonthlySettlement = async (filters) => {
     loading.value = false;
   }
 };
+
+// Filter data by status on frontend
+const filteredSettlementData = computed(() => {
+  if (!settlementData.value) return null;
+  if (currentFilters.value.status === 'ALL') return settlementData.value;
+  
+  // If status doesn't match, return null (show empty state)
+  if (settlementData.value.status !== currentFilters.value.status) {
+    return null;
+  }
+  
+  return settlementData.value;
+});
 
 const handleFilterChange = (filters) => {
   loadMonthlySettlement(filters);
@@ -94,7 +108,7 @@ const handleLogout = () => {
       />
 
       <MonthlyTable 
-        :data="settlementData" 
+        :data="filteredSettlementData" 
         :loading="loading"
         @download-pdf="handleDownloadPdf"
       />

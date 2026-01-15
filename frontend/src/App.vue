@@ -82,6 +82,7 @@ router.afterEach(() => {
           <RouterLink to="/products" class="nav-item">상품 목록</RouterLink>
           <RouterLink to="/orders" class="nav-item">주문 현황</RouterLink>
           <RouterLink to="/cart" class="nav-item">장바구니</RouterLink>
+          <RouterLink to="/settlements" class="nav-item">정산 관리</RouterLink>
           <RouterLink v-if="userRole === 'HQ'" to="/admin/search" class="nav-item highlight">회원 조회</RouterLink>
           <div class="user-actions">
             <span class="user-info" @click="goToProfile">

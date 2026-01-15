@@ -25,9 +25,9 @@ const formatDate = (dateString) => {
 
 const getStatusBadge = (status) => {
   const badges = {
-    WAITING: { text: '대기중', class: 'status-waiting', icon: '⏳' },
-    CONFIRMED: { text: '확정됨', class: 'status-confirmed', icon: '✅' },
-    COMPLETED: { text: '완료됨', class: 'status-completed', icon: '🎉' }
+    WAITING: { text: '대기', class: 'status-waiting', icon: '⏳' },
+    CONFIRMED: { text: '확정', class: 'status-confirmed', icon: '✅' },
+    COMPLETED: { text: '지급 완료', class: 'status-completed', icon: '🎉' }
   };
   return badges[status] || { text: status, class: '', icon: '📋' };
 };
