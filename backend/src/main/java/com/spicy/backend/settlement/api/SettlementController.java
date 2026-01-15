@@ -82,7 +82,7 @@ public class SettlementController {
     public ResponseEntity<Void> createSettlement(
             @Valid @RequestBody DailySettlementRequest request
     ) {
-        settlementService.createSettlement(request.storeId(), request.date());
+        settlementService.createSettlement(request.storeId(), request.productId(), request.date());
         return ResponseEntity.ok().build();
     }
 

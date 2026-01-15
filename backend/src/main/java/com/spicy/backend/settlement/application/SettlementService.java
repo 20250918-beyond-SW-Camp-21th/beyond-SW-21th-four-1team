@@ -1,5 +1,6 @@
 package com.spicy.backend.settlement.application;
 
+import com.spicy.backend.demandplan.error.DemandPlanErrorCode;
 import com.spicy.backend.global.error.exception.BusinessException;
 import com.spicy.backend.order.dao.order.OrderRepository;
 import com.spicy.backend.order.domain.Order;
@@ -27,7 +28,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class SettlementService {
 
-
     private final SettlementRepository settlementRepository;
     private final OrderRepository orderRepository;
 
@@ -50,6 +50,7 @@ public class SettlementService {
                 .orderCount(daily.getOrderCount())
                 .dailyAmount(daily.getTotalOrderAmount())
                 .monthlyAccumulatedAmount(accumulatedAmount)
+                .productId(daily.getProductId())
                 .build();
     }
 
@@ -77,6 +78,7 @@ public class SettlementService {
                         .settlementAmount(totalSettle)
                         .status(s.getStatus())
                         .payoutDate(s.getPayoutDate())
+                        .productId(s.getProductId())
                         .build())
                 .orElse(MonthlySettlementResponse.builder()
                         .totalAmount(BigDecimal.ZERO)
@@ -84,11 +86,12 @@ public class SettlementService {
                         .settlementAmount(BigDecimal.ZERO)
                         .status(null)
                         .payoutDate(null)
+                        .productId(null)
                         .build());
     }
 
     @Transactional
-    public void createSettlement(Long storeId, LocalDate targetDate) {
+    public void createSettlement(Long storeId, Long productId, LocalDate targetDate) {
 
         // 중복 체크
         if (settlementRepository.findByStoreIdAndSettlementDate(storeId, targetDate).isPresent()) {
@@ -102,7 +105,8 @@ public class SettlementService {
                 storeId,
                 com.spicy.backend.order.enums.Status.DELIVERED, // 또는 상황에 맞는 '완료' 상태
                 startOfDay,
-                endOfDay
+                endOfDay,
+                productId
         );
 
         int count = orders.size();
@@ -119,8 +123,25 @@ public class SettlementService {
                 .settlementAmount(settleAmount)
                 .orderCount(count)
                 .status(SettlementStatus.WAITING)
+                .productId(productId)
                 .build();
 
         settlementRepository.save(settlement);
+    }
+
+
+    public Integer getOrderCountInTerm(Long productId, int term) {
+
+        if(productId == null) {
+            throw new BusinessException(DemandPlanErrorCode.FAILED_TO_FETCH_PRODUCTS);
+        }
+        if(term < 0) {
+            throw new BusinessException(DemandPlanErrorCode.NOT_VALID_TERM);
+        }
+
+        LocalDate  endDate = LocalDate.now();
+        LocalDate startDate = endDate.minusDays(term);
+
+        return settlementRepository.getTotalQuantity(productId, startDate, endDate);
     }
 }

@@ -6,14 +6,8 @@ import com.spicy.backend.demandplan.service.ExternalDataFetcher;
 import com.spicy.backend.global.error.exception.BusinessException;
 import com.spicy.backend.inventory.application.InventoryService;
 import com.spicy.backend.settlement.application.SettlementService;
-import com.spicy.backend.settlement.dto.request.DailySettlementRequest;
-import com.spicy.backend.settlement.dto.response.DailySettlementResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -44,29 +38,12 @@ public class ExternalDataFetcherImpl implements ExternalDataFetcher {
     }
 
     @Override
-    public List<Integer> getRecentOrderCount(Long productId, int month) {
-        List<Integer> result = new ArrayList<>();
-        LocalDate today = LocalDate.now();
-
-        for (int i = RECENT_DAYS * month - 1; i >= 0; i--) {
-            LocalDate targetDate = today.minusDays(i);
-
-            try {
-                // 요청
-                DailySettlementRequest request = new DailySettlementRequest(productId, targetDate);
-
-                // 주문 내역 확인
-                DailySettlementResponse response = settlementService.getDailySettlement(request);
-
-                // 리스트에 add
-                result.add(response.orderCount());
-
-            } catch (BusinessException e) {
-                // 해당 일자에 데이터 조회 실패시 0으로 간주
-                result.add(0);
-            }
+    public Integer getRecentOrderCount(Long productId, int month) {
+        // 기간 설정
+        if(month <= 0 || month > 12) {
+            throw new BusinessException(DemandPlanErrorCode.NOT_VALID_TERM);
         }
-
-        return result;
+        int term = RECENT_DAYS * month - 1;
+        return settlementService.getOrderCountInTerm(productId, term);
     }
 }

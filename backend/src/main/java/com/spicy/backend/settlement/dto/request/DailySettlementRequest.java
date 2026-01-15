@@ -12,6 +12,10 @@ public record DailySettlementRequest(
             Long storeId,
 
             @NotNull
+            @Schema(description = "상품 식별 번호",example = "1")
+            Long productId,
+
+            @NotNull
             @PastOrPresent(message = "미래 날짜의 정산은 생성하거나 조회할 수 없습니다.")
             @Schema(description = "조회 날짜", example = "2026-01-09")
             LocalDate date

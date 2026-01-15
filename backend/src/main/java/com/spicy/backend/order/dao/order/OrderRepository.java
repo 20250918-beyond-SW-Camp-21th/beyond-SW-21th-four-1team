@@ -23,6 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             Long storeId,
             Status status, // Status.COMPLETED 등을 넘기기 위해 추가
             LocalDateTime start,
-            LocalDateTime end
+            LocalDateTime end,
+            Long productId
     );
 }

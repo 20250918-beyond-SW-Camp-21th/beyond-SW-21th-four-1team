@@ -41,7 +41,8 @@ class SettlementServiceTests {
         // given
         Long storeId = 1L;
         LocalDate date = LocalDate.of(2026, 1, 10);
-        DailySettlementRequest request = new DailySettlementRequest(storeId, date);
+        Long productId = 1L;
+        DailySettlementRequest request = new DailySettlementRequest(storeId, productId, date);
 
         Settlement daily = createSettlement(date, "10000");
         List<Settlement> monthlyList = List.of(
@@ -64,7 +65,7 @@ class SettlementServiceTests {
     @DisplayName("월별 정산 조회 시, 한 달 치 데이터가 모두 합산되어야 한다")
     void getMonthlySettlement_Success() {
         // given
-        MonthlySettlementRequest request = new MonthlySettlementRequest(1L, "2026-01");
+        MonthlySettlementRequest request = new MonthlySettlementRequest(1L, 1L, "2026-01");
         List<Settlement> monthlyList = List.of(
                 createSettlement(LocalDate.of(2026, 1, 1), "10000", "1000", "9000"),
                 createSettlement(LocalDate.of(2026, 1, 31), "20000", "2000", "18000")
@@ -88,7 +89,7 @@ class SettlementServiceTests {
         given(settlementRepository.findByStoreIdAndSettlementDateBetween(any(), any(), any())).willReturn(Collections.emptyList());
 
         // when
-        MonthlySettlementResponse response = settlementService.getMonthlySettlement(new MonthlySettlementRequest(1L, "2026-01"));
+        MonthlySettlementResponse response = settlementService.getMonthlySettlement(new MonthlySettlementRequest(1L, 1L, "2026-01"));
 
         // then
         assertThat(response.totalAmount()).isEqualByComparingTo(BigDecimal.ZERO);
@@ -117,7 +118,8 @@ class SettlementServiceTests {
         // given
         Long storeId = 1L;
         LocalDate date = LocalDate.of(2026, 1, 30); // 없는 날짜 가정
-        DailySettlementRequest request = new DailySettlementRequest(storeId, date);
+        Long productId = 1L;
+        DailySettlementRequest request = new DailySettlementRequest(storeId, productId, date);
 
         // Mock: 리포지토리가 "데이터 없음(Empty)"을 반환한다고 설정
         given(settlementRepository.findByStoreIdAndSettlementDate(storeId, date))
@@ -128,8 +130,6 @@ class SettlementServiceTests {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("정산 내역이 존재하지 않습니다"); // 에러 메시지 검증
     }
-
-
 
 
 }

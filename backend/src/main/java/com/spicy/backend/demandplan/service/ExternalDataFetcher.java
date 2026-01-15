@@ -7,5 +7,5 @@ import java.util.List;
 public interface ExternalDataFetcher {
 
     StockResponseDto getStock(Long productId);
-    List<Integer> getRecentOrderCount(Long productId, int month);
+    Integer getRecentOrderCount(Long productId, int month);
 }

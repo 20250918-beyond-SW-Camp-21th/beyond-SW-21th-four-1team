@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 
 @Builder
 public record DailySettlementResponse(
+        @Schema(description = "상품 식별 번호", example = "1")
+        Long productId,
+
         @Schema(description = "주문 건수", example = "15")
         Integer orderCount,
 
