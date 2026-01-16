@@ -20,7 +20,7 @@ const error = ref(null);
 const showInboundModal = ref(false);
 const showOutboundModal = ref(false);
 const prefilledProductName = ref('');
-const prefilledProductId = ref(null);
+const outboundProductName = ref('');
 
 const loadProducts = async () => {
   loading.value = true;
@@ -44,7 +44,7 @@ const handleSearch = async (query) => {
   loading.value = true;
   try {
     const result = await inventoryApi.searchByName(query);
-    products.value = result ? [result] : [];
+    products.value = result || [];
   } catch (err) {
     products.value = [];
   } finally {
@@ -92,8 +92,8 @@ const handleInboundConfirm = async (data) => {
   }
 };
 
-const openOutboundRequest = (id = null) => {
-   prefilledProductId.value = id || (selectedProduct.value?.productId);
+const openOutboundRequest = (name = '') => {
+   outboundProductName.value = name || (selectedProduct.value?.productName || '');
    showOutboundModal.value = true;
 };
 
@@ -130,9 +130,8 @@ onMounted(loadProducts);
     </header>
 
     <main class="main-content">
-      <div v-if="error" class="error-alert">
-        <span class="icon">🌶️</span> {{ error }}
-      </div>
+      <!-- Error alert removed to improve UX when backend is offline -->
+
 
       <transition name="pop-in" mode="out-in">
         <InventoryList 
@@ -164,7 +163,7 @@ onMounted(loadProducts);
 
     <OutboundModal 
       :is-open="showOutboundModal"
-      :prefilled-product-id="prefilledProductId"
+      :prefilled-product-name="outboundProductName"
       @close="showOutboundModal = false"
       @confirm="handleOutboundConfirm"
     />

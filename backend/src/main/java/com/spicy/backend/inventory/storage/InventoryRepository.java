@@ -30,21 +30,21 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     List<InventoryLotResponse> findAllProduct();
 
     @Query("""
-                    select new com.spicy.backend.inventory.dto.response.ProductBaseInfo(
-                        i.productId,
-                        i.productName,
-                        i.price,
-                m.minimumQuantity
-                    )
-                    from Inventory i
-            join MinimumProduct m on i.productId = m.productId
-                    group by i.productId, i.productName, i.price, m.minimumQuantity
-                """)
+                select new com.spicy.backend.inventory.dto.response.ProductBaseInfo(
+                    i.productId,
+                    i.productName,
+                    i.price,
+                    m.minimumQuantity
+                )
+                from Inventory i
+                join MinimumProduct m on i.productId = m.productId
+                group by i.productId, i.productName, i.price, m.minimumQuantity
+            """)
     List<ProductBaseInfo> findAllProductBaseInfo();
 
     List<Inventory> findByProductId(Long id);
 
-    List<Inventory> findByProductName(String name);
+    List<Inventory> findByProductNameContaining(String name);
 
     Optional<Inventory> findFirstByProductNameOrderByIdAsc(String name);
 
@@ -52,13 +52,13 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     @Query("""
                 select i
                 from Inventory i
-                where i.productId = :productId
+                where i.productName = :name
                   and i.expirationDate >= :targetDate
                   and i.status = 'ACTIVE'
                 order by i.expirationDate asc
             """)
     List<Inventory> findValidProductsWithLock(
-            @Param("productId") Long productId,
+            @Param("name") String name,
             @Param("targetDate") LocalDate targetDate);
 
     @Query("select i from Inventory i where i.expirationDate < :today AND i.status = 'ACTIVE'")

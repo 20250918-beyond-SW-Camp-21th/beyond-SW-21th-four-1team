@@ -54,7 +54,7 @@ public class InventoryService {
 
             // 해쉬맵에 해당하는 id가 없을 경우 id값과 배열 선언
             if (!inventories.containsKey(id)) {
-                inventories.put(id, new ArrayList());
+                inventories.put(id, new ArrayList<>());
             }
 
             // 해당 id값에 상품 리스트 넣기
@@ -141,40 +141,54 @@ public class InventoryService {
                 productLotResponses);
     }
 
-    public ProductSummaryResponse searchByName(String name) {
+    public List<ProductSummaryResponse> searchByName(String name) {
         // 유통기한 업데이트
         updateExpiredInventoryStatus();
 
-        List<Inventory> inventories = inventoryRepository.findByProductName(name);
+        List<Inventory> inventories = inventoryRepository.findByProductNameContaining(name);
         // 없으면 예외처리
         if (inventories.isEmpty()) {
             throw new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND);
         }
-        Long id = inventories.stream().findFirst().get().getProductId();
-        // 해당하는 상품 최소 수량 가져오기(지금은 가맹점 하나로 치므로 1L로 고정)
-        MinimumProduct minimumProducts = minimumProductRepository.findByProductIdAndStoreId(id, DEFAULT_STORE_ID)
-                .orElseThrow(() -> new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND));
-        List<InventoryLotResponse> productLotResponses = new ArrayList<>();
-        int totalQuantity = 0;
 
-        for (Inventory inventory : inventories) {
-            if (inventory.getStatus() == LotStatus.ACTIVE) {
-                totalQuantity += inventory.getQuantity();
-            }
-            productLotResponses.add(new InventoryLotResponse(
-                    inventory.getProductId(),
-                    inventory.getQuantity(),
-                    inventory.getExpirationDate(),
-                    inventory.getStatus(),
-                    inventory.getProductCode()));
+        // productId별로 그룹화
+        Map<Long, List<Inventory>> grouped = new HashMap<>();
+        for (Inventory i : inventories) {
+            grouped.computeIfAbsent(i.getProductId(), k -> new ArrayList<>()).add(i);
         }
-        return new ProductSummaryResponse(
-                inventories.get(0).getProductId(),
-                inventories.get(0).getProductName(),
-                inventories.get(0).getPrice(),
-                minimumProducts.getMinimumQuantity(),
-                totalQuantity,
-                productLotResponses);
+
+        List<ProductSummaryResponse> results = new ArrayList<>();
+        for (Map.Entry<Long, List<Inventory>> entry : grouped.entrySet()) {
+            Long id = entry.getKey();
+            List<Inventory> productInventories = entry.getValue();
+
+            MinimumProduct minimumProducts = minimumProductRepository.findByProductIdAndStoreId(id, DEFAULT_STORE_ID)
+                    .orElseThrow(() -> new BusinessException(InventoryErrorCode.PRODUCT_NOT_FOUND));
+
+            List<InventoryLotResponse> productLotResponses = new ArrayList<>();
+            int totalQuantity = 0;
+
+            for (Inventory inventory : productInventories) {
+                if (inventory.getStatus() == LotStatus.ACTIVE) {
+                    totalQuantity += inventory.getQuantity();
+                }
+                productLotResponses.add(new InventoryLotResponse(
+                        inventory.getProductId(),
+                        inventory.getQuantity(),
+                        inventory.getExpirationDate(),
+                        inventory.getStatus(),
+                        inventory.getProductCode()));
+            }
+
+            results.add(new ProductSummaryResponse(
+                    productInventories.get(0).getProductId(),
+                    productInventories.get(0).getProductName(),
+                    productInventories.get(0).getPrice(),
+                    minimumProducts.getMinimumQuantity(),
+                    totalQuantity,
+                    productLotResponses));
+        }
+        return results;
     }
 
     public Void inbound(@Valid InventoryRequest inventoryRequest) {
@@ -199,7 +213,7 @@ public class InventoryService {
         int count = request.quantity();
         LocalDate targetDate = LocalDate.now().plusMonths(request.monthsUntilExpiration());
 
-        List<Inventory> inventories = inventoryRepository.findValidProductsWithLock(request.id(), targetDate);
+        List<Inventory> inventories = inventoryRepository.findValidProductsWithLock(request.name(), targetDate);
 
         for (Inventory inventory : inventories) {
             int available = inventory.getQuantity();

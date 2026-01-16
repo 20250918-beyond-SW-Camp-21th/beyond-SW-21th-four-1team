@@ -105,8 +105,7 @@ public class SettlementService {
                 storeId,
                 com.spicy.backend.order.enums.Status.DELIVERED, // 또는 상황에 맞는 '완료' 상태
                 startOfDay,
-                endOfDay,
-                productId
+                endOfDay
         );
 
         int count = orders.size();

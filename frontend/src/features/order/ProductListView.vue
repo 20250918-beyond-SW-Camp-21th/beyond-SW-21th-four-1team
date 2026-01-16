@@ -186,19 +186,6 @@ const goBack = () => {
 
 <template>
   <div class="product-list-page">
-    <nav class="tteok-nav">
-      <div class="nav-container">
-        <div class="brand" @click="goBack">
-          <span class="brand-icon">🌶️</span>
-          <h1 class="brand-name">SPICY <span>ORDER</span></h1>
-        </div>
-        <div class="nav-actions">
-          <button class="cart-link" @click="router.push('/cart')">🛒 장바구니 보기</button>
-          <button class="back-link" @click="goBack">◀ 주방으로 돌아가기</button>
-        </div>
-      </div>
-    </nav>
-
     <header class="tteok-header">
       <div class="header-card premium-card">
         <h2>맛있는 주문하기</h2>
@@ -248,65 +235,6 @@ const goBack = () => {
 .product-list-page {
   min-height: 100vh;
   background-color: #fffbeb;
-}
-
-.tteok-nav {
-  background-color: #ffffff;
-  border-bottom: 4px solid #fde68a;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
-}
-
-.brand-icon { font-size: 1.75rem; }
-.brand-name { font-size: 1.5rem; font-weight: 900; color: #451a03; margin: 0; }
-.brand-name span { color: #e11d48; }
-
-.nav-actions {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.cart-link {
-  background: #e11d48;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 99px;
-  font-weight: 800;
-  cursor: pointer;
-  box-shadow: 0 4px 0 #9f1239;
-  transition: all 0.2s;
-}
-
-.cart-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 #9f1239;
-}
-
-.back-link {
-  background: none;
-  border: none;
-  font-weight: 800;
-  color: #92400e;
-  cursor: pointer;
 }
 
 .tteok-header {

@@ -82,16 +82,6 @@ onMounted(fetchCartItems);
 
 <template>
   <div class="cart-page">
-    <nav class="tteok-nav">
-      <div class="nav-container">
-        <div class="brand" @click="router.push('/inventory')">
-          <span class="brand-icon">🌶️</span>
-          <h1 class="brand-name">SPICY <span>ORDER</span></h1>
-        </div>
-        <button class="back-link" @click="goBack">◀ 상품 목록으로 돌아가기</button>
-      </div>
-    </nav>
-
     <header class="tteok-header">
       <div class="header-card premium-card">
         <h2>내 장바구니 🛒</h2>
@@ -174,30 +164,6 @@ onMounted(fetchCartItems);
   min-height: 100vh;
   background-color: #fffbeb;
 }
-
-.tteok-nav {
-  background-color: #ffffff;
-  border-bottom: 4px solid #fde68a;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.brand { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; }
-.brand-icon { font-size: 1.75rem; }
-.brand-name { font-size: 1.5rem; font-weight: 900; color: #451a03; margin: 0; }
-.brand-name span { color: #e11d48; }
-
-.back-link { background: none; border: none; font-weight: 800; color: #92400e; cursor: pointer; }
 
 .tteok-header {
   max-width: 800px;

@@ -43,8 +43,8 @@ const handleSearch = (e) => {
         <div v-for="p in products" :key="p.productId" class="p-card premium-card" @click="$emit('view-detail', p.productId)">
           <div class="card-head">
             <span class="p-id">No. {{ p.productId }}</span>
-            <div class="status-indicator" :class="{ 'warning': p.totalQuantity < p.minimumQuantity }">
-               {{ p.totalQuantity < p.minimumQuantity ? '⚠️ 품절위기' : '✅ 든든함' }}
+            <div class="status-indicator" :class="{ 'warning': p.totalQuantity < p.minimumQuantity, 'danger': p.totalQuantity === 0 }">
+               {{ p.totalQuantity === 0 ? '🚫 품절' : (p.totalQuantity < p.minimumQuantity ? '⚠️ 품절위기' : '✅ 든든함') }}
             </div>
           </div>
           
@@ -173,6 +173,11 @@ const handleSearch = (e) => {
 .status-indicator.warning {
   background: #fff1f2;
   color: #be123c;
+}
+.status-indicator.danger {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
 }
 
 .p-name {

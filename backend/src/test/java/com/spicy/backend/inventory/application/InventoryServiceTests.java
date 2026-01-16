@@ -171,17 +171,19 @@ class InventoryServiceTests {
                                 .storeId(1L)
                                 .minimumQuantity(3)
                                 .build();
-                when(inventoryRepository.findByProductName(name))
+                when(inventoryRepository.findByProductNameContaining(name))
                                 .thenReturn(List.of(activeInventory, expiredInventory));
 
                 when(minimumProductRepository.findByProductIdAndStoreId(1L, 1L))
                                 .thenReturn(Optional.of(minimumProduct));
 
                 // when
-                ProductSummaryResponse result = inventoryService.searchByName(name);
+                List<ProductSummaryResponse> results = inventoryService.searchByName(name);
 
                 // then
-                assertEquals(15, result.totalQuantity());
+                assertEquals(1, results.size());
+                ProductSummaryResponse result = results.get(0);
+                assertEquals(5, result.totalQuantity()); // Now only counts ACTIVE
                 assertEquals(3, result.minimumQuantity());
         }
 
@@ -218,7 +220,7 @@ class InventoryServiceTests {
         @DisplayName("재고 값이 떨어지는지 정상 확인")
         void outbound() {
                 // given
-                InventoryOutboundRequest request = new InventoryOutboundRequest(1L, 2, 2);
+                InventoryOutboundRequest request = new InventoryOutboundRequest("사이다", 2, 2);
                 Inventory activeInventory = Inventory.builder()
                                 .productId(1L)
                                 .quantity(5)
@@ -230,7 +232,7 @@ class InventoryServiceTests {
                                 .description("음료")
                                 .build();
                 when(inventoryRepository.findValidProductsWithLock(
-                                eq(request.id()),
+                                eq(request.name()),
                                 any(LocalDate.class))).thenReturn(List.of(activeInventory));
                 // when
                 inventoryService.outbound(request);
