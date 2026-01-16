@@ -13,19 +13,22 @@ const emit = defineEmits(['filter-change']);
 
 // Filter state
 const storeId = ref(1);
+const productId = ref(1);
 const selectedDate = ref(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
 const selectedMonth = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
-const selectedStatus = ref('ALL'); // ALL, WAITING, CONFIRMED, COMPLETED
+const selectedStatus = ref('ALL'); // ALL, ORDERED, PAID, COMPLETED
 
 const handleFilter = () => {
   if (props.mode === 'daily') {
     emit('filter-change', {
       storeId: storeId.value,
+      productId: productId.value,
       date: selectedDate.value
     });
   } else {
     emit('filter-change', {
       storeId: storeId.value,
+      productId: productId.value,
       yearMonth: selectedMonth.value,
       status: selectedStatus.value
     });
@@ -33,7 +36,7 @@ const handleFilter = () => {
 };
 
 // Auto-trigger on mount
-watch([storeId, selectedDate, selectedMonth, selectedStatus], () => {
+watch([storeId, productId, selectedDate, selectedMonth, selectedStatus], () => {
   handleFilter();
 }, { immediate: true });
 </script>
@@ -54,6 +57,17 @@ watch([storeId, selectedDate, selectedMonth, selectedStatus], () => {
           type="number" 
           min="1"
           placeholder="가맹점 번호를 입력하세요"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="productId">상품 ID</label>
+        <input 
+          id="productId"
+          v-model.number="productId" 
+          type="number" 
+          min="1"
+          placeholder="상품 번호를 입력하세요"
         />
       </div>
 
@@ -86,9 +100,9 @@ watch([storeId, selectedDate, selectedMonth, selectedStatus], () => {
             class="status-select"
           >
             <option value="ALL">전체</option>
-            <option value="WAITING">대기</option>
-            <option value="CONFIRMED">확정</option>
-            <option value="COMPLETED">지급 완료</option>
+            <option value="ORDERED">발주 완료</option>
+            <option value="PAID">결제 완료</option>
+            <option value="COMPLETED">영수증 발행 완료</option>
           </select>
         </div>
       </template>

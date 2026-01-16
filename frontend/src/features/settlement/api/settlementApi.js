@@ -8,10 +8,10 @@ const getHeaders = () => {
 
 export const settlementApi = {
     // 일별 정산 조회
-    async getDailySettlement(storeId, date) {
-        console.log(`Fetching daily settlement for store ${storeId} on ${date}...`);
+    async getDailySettlement(storeId, productId, date) {
+        console.log(`Fetching daily settlement for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            const response = await fetch(`${BASE_URL}/daily?storeId=${storeId}&date=${date}`, {
+            const response = await fetch(`${BASE_URL}/daily?storeId=${storeId}&productId=${productId}&date=${date}`, {
                 method: 'GET',
                 headers: getHeaders(),
             });
@@ -36,10 +36,10 @@ export const settlementApi = {
     },
 
     // 월별 정산 조회
-    async getMonthlySettlement(storeId, yearMonth) {
-        console.log(`Fetching monthly settlement for store ${storeId} for ${yearMonth}...`);
+    async getMonthlySettlement(storeId, productId, yearMonth) {
+        console.log(`Fetching monthly settlement for store ${storeId}, product ${productId} for ${yearMonth}...`);
         try {
-            const response = await fetch(`${BASE_URL}/monthly?storeId=${storeId}&yearMonth=${yearMonth}`, {
+            const response = await fetch(`${BASE_URL}/monthly?storeId=${storeId}&productId=${productId}&yearMonth=${yearMonth}`, {
                 method: 'GET',
                 headers: getHeaders(),
             });
@@ -64,10 +64,10 @@ export const settlementApi = {
     },
 
     // 월별 정산 PDF 다운로드
-    async downloadMonthlyPdf(storeId, yearMonth) {
-        console.log(`Downloading monthly PDF for store ${storeId} for ${yearMonth}...`);
+    async downloadMonthlyPdf(storeId, productId, yearMonth) {
+        console.log(`Downloading monthly PDF for store ${storeId}, product ${productId} for ${yearMonth}...`);
         try {
-            const response = await fetch(`${BASE_URL}/monthly/download?storeId=${storeId}&yearMonth=${yearMonth}`, {
+            const response = await fetch(`${BASE_URL}/monthly/download?storeId=${storeId}&productId=${productId}&yearMonth=${yearMonth}`, {
                 method: 'GET',
             });
 
@@ -82,7 +82,7 @@ export const settlementApi = {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `월별정산_${yearMonth}.pdf`;
+            a.download = `월별영수증_${yearMonth}.pdf`;
             document.body.appendChild(a);
             a.click();
 
@@ -98,67 +98,49 @@ export const settlementApi = {
         }
     },
 
-    // 일별 정산 PDF 다운로드 (클라이언트 사이드 생성)
-    async downloadDailyPdf(storeId, date, settlementData) {
-        console.log(`Generating daily PDF for store ${storeId} on ${date}...`);
+    // 일별 정산 PDF 다운로드 (백엔드 API 사용)
+    async downloadDailyPdf(storeId, productId, date) {
+        console.log(`Downloading daily PDF for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            // Dynamic import of jsPDF
-            const { jsPDF } = await import('jspdf');
+            const response = await fetch(`${BASE_URL}/daily/download?storeId=${storeId}&productId=${productId}&date=${date}`, {
+                method: 'GET',
+            });
 
-            // Create new PDF document
-            const doc = new jsPDF();
+            if (!response.ok) {
+                throw new Error(`PDF download failed: ${response.status}`);
+            }
 
-            // Add Korean font support (using default for now)
-            doc.setFont('helvetica');
+            // Get the blob data
+            const blob = await response.blob();
 
-            // Title
-            doc.setFontSize(20);
-            doc.text('SPICY - Daily Settlement Report', 105, 20, { align: 'center' });
+            // Create a download link
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `일별영수증_${date}.pdf`;
+            document.body.appendChild(a);
+            a.click();
 
-            // Date
-            doc.setFontSize(12);
-            doc.text(`Date: ${date}`, 20, 40);
-            doc.text(`Store ID: ${storeId}`, 20, 50);
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
 
-            // Line separator
-            doc.setLineWidth(0.5);
-            doc.line(20, 55, 190, 55);
-
-            // Settlement details
-            doc.setFontSize(14);
-            doc.text('Settlement Details', 20, 70);
-
-            doc.setFontSize(11);
-            const yStart = 85;
-            const lineHeight = 10;
-
-            doc.text(`Order Count: ${settlementData.orderCount || 0}`, 30, yStart);
-            doc.text(`Daily Amount: ₩${Number(settlementData.dailyAmount || 0).toLocaleString()}`, 30, yStart + lineHeight);
-            doc.text(`Monthly Accumulated: ₩${Number(settlementData.monthlyAccumulatedAmount || 0).toLocaleString()}`, 30, yStart + lineHeight * 2);
-
-            // Footer
-            doc.setFontSize(9);
-            doc.text(`Generated on: ${new Date().toLocaleString('ko-KR')}`, 105, 280, { align: 'center' });
-
-            // Save the PDF
-            doc.save(`일별정산_${date}.pdf`);
-
-            console.log("Daily PDF generated successfully");
+            console.log("Daily PDF downloaded successfully");
             return true;
         } catch (error) {
-            console.error('Error generating daily PDF:', error);
+            console.error('Error downloading daily PDF:', error);
             throw error;
         }
     },
 
     // 일일 정산 생성
-    async createSettlement(storeId, date) {
-        console.log(`Creating settlement for store ${storeId} on ${date}...`);
+    async createSettlement(storeId, productId, date) {
+        console.log(`Creating settlement for store ${storeId}, product ${productId} on ${date}...`);
         try {
             const response = await fetch(`${BASE_URL}/generate`, {
                 method: 'POST',
                 headers: getHeaders(),
-                body: JSON.stringify({ storeId, date }),
+                body: JSON.stringify({ storeId, productId, date }),
             });
 
             if (!response.ok) {

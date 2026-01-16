@@ -13,6 +13,7 @@ const loading = ref(false);
 const error = ref(null);
 const currentFilters = ref({ 
   storeId: 1, 
+  productId: 1,
   yearMonth: new Date().toISOString().slice(0, 7),
   status: 'ALL'
 });
@@ -23,7 +24,7 @@ const loadMonthlySettlement = async (filters) => {
   currentFilters.value = filters;
   
   try {
-    const data = await settlementApi.getMonthlySettlement(filters.storeId, filters.yearMonth);
+    const data = await settlementApi.getMonthlySettlement(filters.storeId, filters.productId, filters.yearMonth);
     settlementData.value = data;
   } catch (err) {
     error.value = `정산 데이터를 불러올 수 없습니다: ${err.message}`;
@@ -53,7 +54,7 @@ const handleFilterChange = (filters) => {
 const handleDownloadPdf = async () => {
   try {
     loading.value = true;
-    await settlementApi.downloadMonthlyPdf(currentFilters.value.storeId, currentFilters.value.yearMonth);
+    await settlementApi.downloadMonthlyPdf(currentFilters.value.storeId, currentFilters.value.productId, currentFilters.value.yearMonth);
     alert('🌶️ PDF가 성공적으로 다운로드되었습니다!');
   } catch (err) {
     alert(`PDF 다운로드 중 오류가 발생했습니다: ${err.message}`);

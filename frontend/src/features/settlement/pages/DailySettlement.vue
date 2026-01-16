@@ -11,7 +11,7 @@ const router = useRouter();
 const settlementData = ref(null);
 const loading = ref(false);
 const error = ref(null);
-const currentFilters = ref({ storeId: 1, date: new Date().toISOString().split('T')[0] });
+const currentFilters = ref({ storeId: 1, productId: 1, date: new Date().toISOString().split('T')[0] });
 
 const loadDailySettlement = async (filters) => {
   loading.value = true;
@@ -19,7 +19,7 @@ const loadDailySettlement = async (filters) => {
   currentFilters.value = filters;
   
   try {
-    const data = await settlementApi.getDailySettlement(filters.storeId, filters.date);
+    const data = await settlementApi.getDailySettlement(filters.storeId, filters.productId, filters.date);
     settlementData.value = data;
   } catch (err) {
     error.value = `정산 데이터를 불러올 수 없습니다: ${err.message}`;
@@ -40,7 +40,7 @@ const handleCreateSettlement = async () => {
 
   try {
     loading.value = true;
-    await settlementApi.createSettlement(currentFilters.value.storeId, currentFilters.value.date);
+    await settlementApi.createSettlement(currentFilters.value.storeId, currentFilters.value.productId, currentFilters.value.date);
     alert('🌶️ 정산이 성공적으로 생성되었습니다!');
     // Reload the data
     await loadDailySettlement(currentFilters.value);
@@ -61,8 +61,8 @@ const handleDownloadPdf = async () => {
     loading.value = true;
     await settlementApi.downloadDailyPdf(
       currentFilters.value.storeId, 
-      currentFilters.value.date,
-      settlementData.value
+      currentFilters.value.productId,
+      currentFilters.value.date
     );
     alert('🌶️ PDF가 성공적으로 다운로드되었습니다!');
   } catch (err) {

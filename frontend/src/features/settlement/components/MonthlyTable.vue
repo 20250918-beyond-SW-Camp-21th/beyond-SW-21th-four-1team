@@ -25,9 +25,9 @@ const formatDate = (dateString) => {
 
 const getStatusBadge = (status) => {
   const badges = {
-    WAITING: { text: '대기', class: 'status-waiting', icon: '⏳' },
-    CONFIRMED: { text: '확정', class: 'status-confirmed', icon: '✅' },
-    COMPLETED: { text: '지급 완료', class: 'status-completed', icon: '🎉' }
+    ORDERED: { text: '발주 완료', class: 'status-ordered', icon: '📦' },
+    PAID: { text: '결제 완료', class: 'status-paid', icon: '✅' },
+    COMPLETED: { text: '영수증 발행 완료', class: 'status-completed', icon: '🎉' }
   };
   return badges[status] || { text: status, class: '', icon: '📋' };
 };
@@ -58,16 +58,24 @@ const handleDownload = () => {
         <div class="summary-card premium-card">
           <div class="card-icon">💳</div>
           <div class="card-content">
-            <label>수수료 금액</label>
-            <div class="value commission">{{ formatCurrency(data.commissionAmount) }}</div>
+            <label>공급가액</label>
+            <div class="value supply">{{ formatCurrency(data.supplyAmount) }}</div>
+          </div>
+        </div>
+
+        <div class="summary-card premium-card">
+          <div class="card-icon">📄</div>
+          <div class="card-content">
+            <label>부가세 (10%)</label>
+            <div class="value tax">{{ formatCurrency(data.taxAmount) }}</div>
           </div>
         </div>
 
         <div class="summary-card premium-card highlight">
           <div class="card-icon">🎯</div>
           <div class="card-content">
-            <label>최종 정산 금액</label>
-            <div class="value final">{{ formatCurrency(data.settlementAmount) }}</div>
+            <label>최종 매입 금액</label>
+            <div class="value final">{{ formatCurrency(data.totalAmount) }}</div>
           </div>
         </div>
       </div>
@@ -103,19 +111,19 @@ const handleDownload = () => {
             </div>
           </div>
 
-          <div class="table-row highlight-row">
-            <div class="table-label">주문 금액</div>
-            <div class="table-value">{{ formatCurrency(data.totalAmount) }}</div>
+          <div class="table-row">
+            <div class="table-label">공급가액</div>
+            <div class="table-value">{{ formatCurrency(data.supplyAmount) }}</div>
           </div>
 
           <div class="table-row">
-            <div class="table-label">수수료 (차감)</div>
-            <div class="table-value commission">- {{ formatCurrency(data.commissionAmount) }}</div>
+            <div class="table-label">부가세 (10%)</div>
+            <div class="table-value tax">+ {{ formatCurrency(data.taxAmount) }}</div>
           </div>
 
           <div class="table-row total-row">
-            <div class="table-label">최종 정산 금액</div>
-            <div class="table-value final">{{ formatCurrency(data.settlementAmount) }}</div>
+            <div class="table-label">최종 매입 금액</div>
+            <div class="table-value final">{{ formatCurrency(data.totalAmount) }}</div>
           </div>
         </div>
       </div>
@@ -184,7 +192,11 @@ const handleDownload = () => {
   color: var(--deep-brown);
 }
 
-.value.commission {
+.value.supply {
+  color: var(--deep-brown);
+}
+
+.value.tax {
   color: var(--sauce-orange);
 }
 
@@ -282,7 +294,7 @@ const handleDownload = () => {
   text-align: right;
 }
 
-.table-value.commission {
+.table-value.tax {
   color: var(--sauce-orange);
 }
 
@@ -299,13 +311,13 @@ const handleDownload = () => {
   font-weight: 800;
 }
 
-.status-waiting {
+.status-ordered {
   background: #fef3c7;
   color: #92400e;
   border: 2px solid #fde68a;
 }
 
-.status-confirmed {
+.status-paid {
   background: #d1fae5;
   color: #065f46;
   border: 2px solid #6ee7b7;
