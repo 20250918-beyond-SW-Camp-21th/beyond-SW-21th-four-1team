@@ -12,6 +12,8 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(['download-pdf']);
+
 const formatCurrency = (value) => {
   if (!value) return '₩0';
   return `₩${Number(value).toLocaleString()}`;
@@ -22,6 +24,10 @@ const progressPercentage = computed(() => {
   const percentage = (Number(props.data.dailyAmount) / Number(props.data.monthlyAccumulatedAmount)) * 100;
   return Math.min(percentage, 100);
 });
+
+const handleDownload = () => {
+  emit('download-pdf');
+};
 </script>
 
 <template>
@@ -71,8 +77,13 @@ const progressPercentage = computed(() => {
       <!-- Progress Bar -->
       <div class="progress-section premium-card">
         <div class="progress-header">
-          <span class="icon">🔥</span>
-          <h3>이번 달 진행률</h3>
+          <div class="header-left">
+            <span class="icon">🔥</span>
+            <h3>이번 달 진행률</h3>
+          </div>
+          <button class="btn-download-daily" @click="handleDownload">
+            <span>📄 PDF 다운로드</span>
+          </button>
         </div>
         <div class="progress-bar">
           <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
@@ -168,9 +179,17 @@ const progressPercentage = computed(() => {
 
 .progress-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.progress-header .header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .progress-header .icon {
@@ -182,6 +201,32 @@ const progressPercentage = computed(() => {
   font-weight: 900;
   color: var(--deep-brown);
   margin: 0;
+}
+
+.btn-download-daily {
+  padding: 0.6rem 1.25rem;
+  background: linear-gradient(135deg, var(--spicy-red), var(--sauce-orange));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0px #e11d48;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-download-daily:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0px #e11d48;
+}
+
+.btn-download-daily:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0px #e11d48;
 }
 
 .progress-bar {

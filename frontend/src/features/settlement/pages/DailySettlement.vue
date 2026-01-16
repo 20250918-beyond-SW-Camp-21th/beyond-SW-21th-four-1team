@@ -51,6 +51,27 @@ const handleCreateSettlement = async () => {
   }
 };
 
+const handleDownloadPdf = async () => {
+  if (!settlementData.value) {
+    alert('다운로드할 정산 데이터가 없습니다.');
+    return;
+  }
+
+  try {
+    loading.value = true;
+    await settlementApi.downloadDailyPdf(
+      currentFilters.value.storeId, 
+      currentFilters.value.date,
+      settlementData.value
+    );
+    alert('🌶️ PDF가 성공적으로 다운로드되었습니다!');
+  } catch (err) {
+    alert(`PDF 다운로드 중 오류가 발생했습니다: ${err.message}`);
+  } finally {
+    loading.value = false;
+  }
+};
+
 const handleLogout = () => {
   if (confirm('정말 주방에서 퇴근하시겠습니까? 👩‍🍳')) {
     alert('로그아웃되었습니다. 다음에 또 만나요!');
@@ -105,6 +126,7 @@ const handleLogout = () => {
       <DailySummary 
         :data="settlementData" 
         :loading="loading"
+        @download-pdf="handleDownloadPdf"
       />
     </main>
   </div>

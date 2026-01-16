@@ -65,7 +65,7 @@ export const settlementApi = {
 
     // 월별 정산 PDF 다운로드
     async downloadMonthlyPdf(storeId, yearMonth) {
-        console.log(`Downloading PDF for store ${storeId} for ${yearMonth}...`);
+        console.log(`Downloading monthly PDF for store ${storeId} for ${yearMonth}...`);
         try {
             const response = await fetch(`${BASE_URL}/monthly/download?storeId=${storeId}&yearMonth=${yearMonth}`, {
                 method: 'GET',
@@ -82,7 +82,7 @@ export const settlementApi = {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `settlement_${yearMonth}.pdf`;
+            a.download = `월별정산_${yearMonth}.pdf`;
             document.body.appendChild(a);
             a.click();
 
@@ -90,10 +90,63 @@ export const settlementApi = {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
 
-            console.log("PDF downloaded successfully");
+            console.log("Monthly PDF downloaded successfully");
             return true;
         } catch (error) {
-            console.error('Error downloading PDF:', error);
+            console.error('Error downloading monthly PDF:', error);
+            throw error;
+        }
+    },
+
+    // 일별 정산 PDF 다운로드 (클라이언트 사이드 생성)
+    async downloadDailyPdf(storeId, date, settlementData) {
+        console.log(`Generating daily PDF for store ${storeId} on ${date}...`);
+        try {
+            // Dynamic import of jsPDF
+            const { jsPDF } = await import('jspdf');
+
+            // Create new PDF document
+            const doc = new jsPDF();
+
+            // Add Korean font support (using default for now)
+            doc.setFont('helvetica');
+
+            // Title
+            doc.setFontSize(20);
+            doc.text('SPICY - Daily Settlement Report', 105, 20, { align: 'center' });
+
+            // Date
+            doc.setFontSize(12);
+            doc.text(`Date: ${date}`, 20, 40);
+            doc.text(`Store ID: ${storeId}`, 20, 50);
+
+            // Line separator
+            doc.setLineWidth(0.5);
+            doc.line(20, 55, 190, 55);
+
+            // Settlement details
+            doc.setFontSize(14);
+            doc.text('Settlement Details', 20, 70);
+
+            doc.setFontSize(11);
+            const yStart = 85;
+            const lineHeight = 10;
+
+            doc.text(`Order Count: ${settlementData.orderCount || 0}`, 30, yStart);
+            doc.text(`Daily Amount: ₩${Number(settlementData.dailyAmount || 0).toLocaleString()}`, 30, yStart + lineHeight);
+            doc.text(`Monthly Accumulated: ₩${Number(settlementData.monthlyAccumulatedAmount || 0).toLocaleString()}`, 30, yStart + lineHeight * 2);
+
+            // Footer
+            doc.setFontSize(9);
+            doc.text(`Generated on: ${new Date().toLocaleString('ko-KR')}`, 105, 280, { align: 'center' });
+
+            // Save the PDF
+            doc.save(`일별정산_${date}.pdf`);
+
+            console.log("Daily PDF generated successfully");
+            return true;
+        } catch (error) {
+            console.error('Error generating daily PDF:', error);
             throw error;
         }
     },
