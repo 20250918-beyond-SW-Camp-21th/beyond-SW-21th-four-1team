@@ -14,7 +14,6 @@ import com.spicy.backend.order.dto.request.wrapper.OrderAndOrderItemRequest;
 import com.spicy.backend.order.dto.response.OrderCanceledResponse;
 import com.spicy.backend.order.dto.response.OrderCreateResponse;
 import com.spicy.backend.order.dto.response.OrderItemResponse;
-import com.spicy.backend.order.dto.response.OrderResponse;
 import com.spicy.backend.order.enums.Status;
 import com.spicy.backend.order.error.OrderErrorCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,8 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTests {
@@ -191,11 +188,11 @@ class OrderServiceTests {
         @DisplayName("주문 정보 상세 조회 - 성공")
         void getOrderDetails_Success() {
                 // given
-                given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId,
-                                orderId)).willReturn(List.of(orderItem));
+                given(orderItemRepository.findAllByUserIdAndStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(
+                                userId, storeId, orderId)).willReturn(List.of(orderItem));
 
                 // when
-                List<OrderItemResponse> response = orderService.getOrderDetails(storeId, orderId);
+                List<OrderItemResponse> response = orderService.getOrderDetails(userId, storeId, orderId);
 
                 // then
                 assertEquals("productName", response.get(0).productName());
@@ -208,12 +205,12 @@ class OrderServiceTests {
         @DisplayName("주문 정보 상세 조회 - 실패 - ORDER_ITEM_NOT_FOUND")
         void getOrderDetails_Failure_ORDER_ITEM_NOT_FOUND() {
                 // given
-                given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId,
-                                orderId)).willReturn(List.of());
+                given(orderItemRepository.findAllByUserIdAndStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(
+                                userId, storeId, orderId)).willReturn(List.of());
 
                 // when & then
                 BusinessException exception = assertThrows(BusinessException.class,
-                                () -> orderService.getOrderDetails(storeId, orderId));
+                                () -> orderService.getOrderDetails(userId, storeId, orderId));
                 assertEquals("주문 상품이 존재하지 않거나 권한이 없습니다.", exception.getMessage());
                 assertEquals(OrderErrorCode.ORDER_ITEM_NOT_FOUND, exception.getErrorCode());
         }
@@ -225,11 +222,11 @@ class OrderServiceTests {
                 given(orderRepository.findByStoreIdAndIdAndDeletedAtIsNull(storeId, orderId))
                                 .willReturn(Optional.of(order));
 
-                given(orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId,
-                                orderId)).willReturn(List.of(orderItem));
+                given(orderItemRepository.findAllByUserIdAndStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(
+                                userId, storeId, orderId)).willReturn(List.of(orderItem));
 
                 // when
-                OrderCanceledResponse response = orderService.cancelOrder(storeId, orderId);
+                OrderCanceledResponse response = orderService.cancelOrder(userId, storeId, orderId);
 
                 // then
                 assertEquals(Status.CANCELLED, response.order().status());
@@ -246,7 +243,7 @@ class OrderServiceTests {
 
                 // then & when
                 BusinessException exception = assertThrows(BusinessException.class,
-                                () -> orderService.cancelOrder(storeId, orderId));
+                                () -> orderService.cancelOrder(userId, storeId, orderId));
                 assertEquals(OrderErrorCode.ORDER_NOT_FOUND, exception.getErrorCode());
         }
 }

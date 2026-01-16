@@ -5,5 +5,5 @@ import com.spicy.backend.order.domain.OrderItem;
 import java.util.List;
 
 public interface OrderItemRepositoryCustom {
-    List<OrderItem> findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long storeId, Long orderId);
+    List<OrderItem> findAllByUserIdAndStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long userId, Long storeId, Long orderId);
 }

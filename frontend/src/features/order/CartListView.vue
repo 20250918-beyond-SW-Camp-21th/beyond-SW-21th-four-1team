@@ -21,7 +21,7 @@ const deliveryInfo = ref({
 const fetchCartItems = async () => {
   loading.value = true;
   try {
-    const response = await cartApi.getCartItems(userId, storeId);
+    const response = await cartApi.getCartItems(storeId);
     // API returns { data: [...] }
     cartItems.value = response.data || [];
   } catch (err) {
@@ -34,7 +34,7 @@ const fetchCartItems = async () => {
 const deleteItem = async (cartItemId) => {
   if (!confirm('정말 삭제하시겠습니까? 🥣')) return;
   try {
-    await cartApi.deleteCartItem(userId, storeId, cartItemId);
+    await cartApi.deleteCartItem(storeId, cartItemId);
     await fetchCartItems();
   } catch (err) {
     alert('삭제에 실패했습니다.');
@@ -66,7 +66,7 @@ const goToOrder = async () => {
       return;
     }
     
-    await orderApi.createOrder(userId, storeId, orderData);
+    await orderApi.createOrder(storeId, orderData);
     alert('✨ 주문이 성공적으로 접수되었습니다!');
     router.push('/inventory'); // Navigate back after order
   } catch (err) {
