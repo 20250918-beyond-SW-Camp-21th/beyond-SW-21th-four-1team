@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spicy-config
+data:
+  SPRING_DATASOURCE_URL: "jdbc:mariadb://dev.macacolabs.site:7000/spicy"
+  JWT_EXPIRATION: "1800000"
+  JWT_REFRESH_EXPIRATION: "1209600000"

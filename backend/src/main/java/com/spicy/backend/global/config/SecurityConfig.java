@@ -43,8 +43,6 @@ public class SecurityConfig {
                                                                 "/api/v1/demand-plan/**",
                                                                 "/api/v1/cart-items/**",
                                                                 "/api/v1/orders/**",
-                                                                "/api/v1/inventory/**",
-                                                                "/api/v1/demand-plan/**",
                                                                 "/api/v1/settlements/**"
                                                         )
                                                 .permitAll()
