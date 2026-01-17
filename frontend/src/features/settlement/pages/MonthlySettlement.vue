@@ -62,34 +62,10 @@ const handleDownloadPdf = async () => {
     loading.value = false;
   }
 };
-
-const handleLogout = () => {
-  if (confirm('정말 주방에서 퇴근하시겠습니까? 👩‍🍳')) {
-    alert('로그아웃되었습니다. 다음에 또 만나요!');
-    // router.push('/login') // Later: redirect to login
-  }
-};
 </script>
 
 <template>
   <div class="settlement-app">
-    <nav class="tteok-nav">
-      <div class="nav-container">
-        <div class="brand">
-          <span class="brand-icon">🌶️</span>
-          <h1 class="brand-name">SPICY</h1>
-        </div>
-        <div class="nav-links">
-          <span class="user-info">어서오세요, 셰프님! 👩‍🍳</span>
-          <button class="nav-btn" @click="router.push('/inventory')">재고 관리</button>
-          <button class="nav-btn" @click="router.push('/orders')">주문 현황</button>
-          <button class="nav-btn" @click="router.push('/settlements/daily')">일별 정산</button>
-          <button class="nav-btn active" @click="router.push('/settlements/monthly')">월별 정산</button>
-          <button class="logout-btn" @click="handleLogout">퇴근하기</button>
-        </div>
-      </div>
-    </nav>
-
     <header class="tteok-header">
       <div class="header-card premium-card">
         <h2>월별 정산 조회</h2>
@@ -121,103 +97,6 @@ const handleLogout = () => {
 .settlement-app {
   min-height: 100vh;
   background-color: var(--rice-cream);
-}
-
-.tteok-nav {
-  background-color: #ffffff;
-  border-bottom: 4px solid var(--border-color);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.brand-icon {
-  font-size: 1.75rem;
-  filter: drop-shadow(0 2px 4px rgba(225, 29, 72, 0.2));
-}
-
-.brand-name {
-  font-size: 1.5rem;
-  font-weight: 900;
-  color: var(--deep-brown);
-  margin: 0;
-  letter-spacing: -0.05em;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  flex-wrap: wrap;
-}
-
-.user-info {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  font-weight: 700;
-  background: var(--rice-cream);
-  padding: 0.4rem 1.2rem;
-  border-radius: 99px 0 0 99px;
-  border: 1px solid var(--border-color);
-  border-right: none;
-}
-
-.nav-btn {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: var(--deep-brown);
-  background: var(--border-color);
-  padding: 0.4rem 1.2rem;
-  border: 1px solid var(--border-color);
-  border-left: 1px solid rgba(0,0,0,0.1);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.nav-btn:hover {
-  background: #fde68a;
-}
-
-.nav-btn.active {
-  background: var(--spicy-red);
-  color: white;
-  border-color: var(--spicy-red);
-}
-
-.logout-btn {
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #ffffff;
-  background: var(--text-muted);
-  padding: 0.4rem 1.2rem;
-  border-top: 1px solid var(--text-muted);
-  border-bottom: 1px solid var(--text-muted);
-  border-left: none;
-  border-right: 1px solid var(--text-muted);
-  border-radius: 0 99px 99px 0;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  background: var(--deep-brown);
 }
 
 .tteok-header {

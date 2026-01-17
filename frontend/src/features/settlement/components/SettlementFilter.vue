@@ -34,11 +34,6 @@ const handleFilter = () => {
     });
   }
 };
-
-// Auto-trigger on mount
-watch([storeId, productId, selectedDate, selectedMonth, selectedStatus], () => {
-  handleFilter();
-}, { immediate: true });
 </script>
 
 <template>

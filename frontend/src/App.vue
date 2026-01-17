@@ -82,7 +82,15 @@ router.afterEach(() => {
           <RouterLink to="/products" class="nav-item">상품 목록</RouterLink>
           <RouterLink to="/orders" class="nav-item">주문 현황</RouterLink>
           <RouterLink to="/cart" class="nav-item">장바구니</RouterLink>
-          <RouterLink to="/settlements" class="nav-item">정산 관리</RouterLink>
+          
+          <div class="nav-dropdown">
+            <RouterLink to="/settlements" class="nav-item">정산 관리</RouterLink>
+            <div class="dropdown-content">
+              <RouterLink to="/settlements/daily" class="dropdown-item">일별 정산</RouterLink>
+              <RouterLink to="/settlements/monthly" class="dropdown-item">월별 정산</RouterLink>
+            </div>
+          </div>
+          
           <RouterLink v-if="userRole === 'HQ'" to="/admin/search" class="nav-item highlight">회원 조회</RouterLink>
           <div class="user-actions">
             <span class="user-info" @click="goToProfile">
@@ -168,6 +176,81 @@ router.afterEach(() => {
 
 .nav-item.highlight {
     color: var(--sauce-orange);
+}
+
+/* Dropdown Menu Styles */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  z-index: 1000;
+  margin-top: 0;
+  overflow: hidden;
+  /* Add padding at top to bridge the gap */
+  padding-top: 0.5rem;
+}
+
+/* Create invisible bridge between button and menu */
+.dropdown-content::before {
+  content: '';
+  position: absolute;
+  top: -0.5rem;
+  left: 0;
+  right: 0;
+  height: 0.5rem;
+  background: transparent;
+}
+
+.nav-dropdown:hover .dropdown-content {
+  display: block;
+  animation: fadeIn 0.2s ease-in;
+  /* Add transition delay to prevent immediate closing */
+  transition: opacity 0.3s ease;
+}
+
+/* Prevent menu from closing when moving mouse to it */
+.nav-dropdown .dropdown-content:hover {
+  display: block;
+}
+
+.dropdown-item {
+  display: block;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--deep-brown);
+  padding: 1rem 1.5rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dropdown-item:hover {
+  background: var(--rice-cream);
+  color: var(--spicy-red);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .user-actions {
