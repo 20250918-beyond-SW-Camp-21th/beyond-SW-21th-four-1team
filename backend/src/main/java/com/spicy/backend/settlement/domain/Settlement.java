@@ -23,19 +23,18 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Table(
-    uniqueConstraints = {
-    @UniqueConstraint(
-            name = "settlement_store_date",
-            columnNames = {"store_id", "settlement_date"}
-        )
-    }
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "settlement",
+                        columnNames = {"store_id", "settlement_date"}
+                )
+        }
 )
 public class Settlement extends BaseEntity {
 
@@ -47,44 +46,55 @@ public class Settlement extends BaseEntity {
     @Column(name = "store_id", nullable = false)
     private Long storeId;
 
-    // 정산 기준 날짜
+    // 정산/발주 기준 날짜
     @Column(name = "settlement_date", nullable = false)
     private LocalDate settlementDate;
 
-    // 주문 건수
+    // 해당 일자의 총 발주 건수
     @Column(nullable = false)
     @NotNull
     @Min(1)
     private Integer orderCount;
 
-    // 주문 금액 합계
+    // 물건 원가,공급가액 (totalAmount / 1.1)
     @Column(nullable = false, precision = 15, scale = 2)
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
-    private BigDecimal totalOrderAmount;
+    private BigDecimal supplyAmount;
 
-    // 수수료 금액 (본사 수익)
+    // 부가세 (10%)
     @Column(nullable = false, precision = 15, scale = 2)
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
-    private BigDecimal commissionAmount;
+    private BigDecimal taxAmount;
 
-    // 최종 정산 금액
+    // 가맹점이 본사에 낼 최종 금액 (공급가 + 부가세)
     @Column(nullable = false, precision = 15, scale = 2)
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
-    private BigDecimal settlementAmount;
+    private BigDecimal totalSettlementAmount;
 
-    // 지급 예정일
+    // 본사 발주 대금 결제(예정)일
+    @Column
     private LocalDate payoutDate;
 
+    // 정산 상태 (ORDERED, PAID, COMPLETED)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull
     private SettlementStatus status;
 
+    // PDF 영수증의 MinIO 저장 경로를 기록
+    @Column(length = 500)
+    private String pdfUrl;
+
+    // PDF URL 업데이트를 위한 메서드
+    public void updatePdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
+    }
+
     // 상품 ID
     @Column(nullable = false)
+    @NotNull
     private Long productId;
-
 }
