@@ -37,7 +37,7 @@ public class OrderService {
         if (cartList.isEmpty()) throw new BusinessException(CartItemErrorCode.CART_ITEM_NOT_FOUND);
 
         // Order 생성 및 저장
-        Order order = orderRepository.save(Order.create(request, storeId));
+        Order order = orderRepository.save(Order.create(userId, request, storeId));
 
         // OrderItem 생성 및 저장
         createAndSaveOrderItems(cartList, order);
@@ -49,19 +49,19 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrderResponse> getAllOrders(Long storeId, Status status) {
+    public List<OrderResponse> getAllOrders(Long userId, Long storeId, Status status) {
         // status에 따라 주문 리스트 조회
-        List<Order> orders = orderRepository.findAllByStoreIdAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(storeId, status);
+        List<Order> orders = orderRepository.findAllByUserIdAndStoreIdAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(userId, storeId, status);
 
         // 리스트 반환
         return OrderResponse.from(orders);
     }
 
     @Transactional(readOnly = true)
-    public List<OrderItemResponse> getOrderDetails(Long storeId, Long orderId) {
-        // storeId, orderId로 OrderItem 리스트 조회
+    public List<OrderItemResponse> getOrderDetails(Long userId, Long storeId, Long orderId) {
+        // userId, storeId, orderId로 OrderItem 리스트 조회
         // 리스트 길이가 0일 때 예외 발생
-        List<OrderItem> itemList = orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId, orderId);
+        List<OrderItem> itemList = orderItemRepository.findAllByUserIdAndStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId, storeId, orderId);
         if (itemList.isEmpty()) throw new BusinessException(OrderErrorCode.ORDER_ITEM_NOT_FOUND);
 
         // OrderItem 리스트를 OrderItemResponse 리스트로 변환 후 반환
@@ -69,11 +69,11 @@ public class OrderService {
     }
 
     @Transactional(rollbackFor = BusinessException.class)
-    public OrderCanceledResponse cancelOrder(Long storeId, Long orderId) {
+    public OrderCanceledResponse cancelOrder(Long userId, Long storeId, Long orderId) {
         // 사용자 검증
-        Order order = orderRepository.findByStoreIdAndIdAndDeletedAtIsNull(storeId, orderId)
+        Order order = orderRepository.findByUserIdAndStoreIdAndIdAndDeletedAtIsNull(userId, storeId, orderId)
                 .orElseThrow(() -> new BusinessException(OrderErrorCode.ORDER_NOT_FOUND));
-        List<OrderItem> items = orderItemRepository.findAllByStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(storeId, orderId);
+        List<OrderItem> items = orderItemRepository.findAllByUserIdAndStoreIdAndOrderIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId, storeId, orderId);
 
         // 주문과 주문 상품의 상태를 취소로 변경
         order.updateStatus(Status.CANCELLED);

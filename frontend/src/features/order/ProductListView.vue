@@ -162,7 +162,6 @@ const addToCart = async (product) => {
 
   addingToCart.value[product.productId] = true;
   try {
-    const userId = 1;
     const storeId = 1;
     const items = [
       {
@@ -170,7 +169,7 @@ const addToCart = async (product) => {
         quantity: qty
       }
     ];
-    await cartApi.addCartItem(userId, storeId, items);
+    await cartApi.addCartItem(storeId, items);
     alert(`🛒 ${product.productName} ${qty}개가 장바구니에 담겼습니다!`);
   } catch (err) {
     alert('🔥 장바구니 담기에 실패했습니다.');

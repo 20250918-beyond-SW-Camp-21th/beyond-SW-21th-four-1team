@@ -1,12 +1,12 @@
-import axios from 'axios';
+import api from './axios';
 
-const API_BASE_URL = '/api/v1/cart-items';
+const API_BASE_URL = '/cart-items';
 
 export const cartApi = {
     // 장바구니 추가
-    addCartItem: async (userId, storeId, items) => {
+    addCartItem: async (storeId, items) => {
         try {
-            const response = await axios.post(`${API_BASE_URL}/${userId}/${storeId}`, items);
+            const response = await api.post(`${API_BASE_URL}/${storeId}`, items);
             return response.data;
         } catch (error) {
             console.error('Error adding to cart:', error);
@@ -15,9 +15,9 @@ export const cartApi = {
     },
 
     // 장바구니 조회
-    getCartItems: async (userId, storeId) => {
+    getCartItems: async (storeId) => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/${userId}/${storeId}`);
+            const response = await api.get(`${API_BASE_URL}/${storeId}`);
             return response.data;
         } catch (error) {
             console.error('Error fetching cart items:', error);
@@ -26,9 +26,9 @@ export const cartApi = {
     },
 
     // 장바구니 상품 삭제
-    deleteCartItem: async (userId, storeId, cartItemId) => {
+    deleteCartItem: async (storeId, cartItemId) => {
         try {
-            const response = await axios.delete(`${API_BASE_URL}/${userId}/${storeId}/${cartItemId}`);
+            const response = await api.delete(`${API_BASE_URL}/${storeId}/${cartItemId}`);
             return response.data;
         } catch (error) {
             console.error('Error deleting cart item:', error);

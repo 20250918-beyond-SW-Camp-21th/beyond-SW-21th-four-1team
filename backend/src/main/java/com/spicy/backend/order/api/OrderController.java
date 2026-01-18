@@ -11,6 +11,8 @@ import com.spicy.backend.order.enums.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,39 +32,53 @@ public class OrderController {
 
     // 주문 생성
     @Operation(summary = "주문 생성", description = "가맹점주로부터 데이터를 전달받아 주문 생성")
-    @PostMapping("/{user-id}/{store-id}")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{store-id}")
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
-            @PathVariable("user-id") Long userId,
+            Authentication authentication,
             @PathVariable("store-id") Long storeId, // 가맹점 식별 번호
             @RequestBody OrderCreateRequest request) {
+        Long userId = (Long) authentication.getPrincipal();
+
         return ResponseEntity.ok(ApiResponse.success(orderService.createOrder(storeId, userId, request)));
     }
 
     // 주문 조회
     @Operation(summary = "주문 조회", description = "가맹점주의 요청에 따라 전체, 완료, 취소된 주문 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{status}/{store-id}")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getOrders(
             @PathVariable("store-id") Long storeId, // 가맹점 식별 번호
-            @PathVariable Status status) {
-        return ResponseEntity.ok(ApiResponse.success(orderService.getAllOrders(storeId, status)));
+            @PathVariable Status status,
+            Authentication authentication) {
+        Long userId = (Long) authentication.getPrincipal();
+
+        return ResponseEntity.ok(ApiResponse.success(orderService.getAllOrders(userId, storeId, status)));
     }
 
     // 주문 상세 조회
     @Operation(summary = "주문 상세 조회", description = "해당 주문의 상세 정보 조회")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{store-id}/{order-id}/details")
     public ResponseEntity<ApiResponse<List<OrderItemResponse>>> getOrderDetails(
+            Authentication authentication,
             @PathVariable("store-id") Long storeId,
             @PathVariable("order-id") Long orderId) {
-        return ResponseEntity.ok(ApiResponse.success(orderService.getOrderDetails(storeId, orderId)));
+        Long userId = (Long) authentication.getPrincipal();
+
+        return ResponseEntity.ok(ApiResponse.success(orderService.getOrderDetails(userId, storeId, orderId)));
     }
 
     // 주문 취소
     @Operation(summary = "주문 취소", description = "가맹점주가 생성했던 주문 중 요청받은 건들에 대해 취소를 진행")
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{store-id}/{order-id}")
     public ResponseEntity<ApiResponse<OrderCanceledResponse>> cancelOrders(
+            Authentication authentication,
             @PathVariable("store-id") Long storeId, // 가맹점 식별 번호
             @PathVariable("order-id") Long orderId) {
+        Long userId = (Long) authentication.getPrincipal();
 
-        return ResponseEntity.ok(ApiResponse.success(orderService.cancelOrder(storeId, orderId)));
+        return ResponseEntity.ok(ApiResponse.success(orderService.cancelOrder(userId, storeId, orderId)));
     }
 }

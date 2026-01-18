@@ -40,6 +40,10 @@ public class Order extends BaseEntity {
     @Column(nullable = false)
     private Long storeId;
 
+    // fk: 주문 생성자 userId
+    @Column(nullable = false)
+    private Long userId;
+
     // 총 주문 금액
     @Column(nullable = false)
     private BigDecimal totalAmount;
@@ -76,8 +80,9 @@ public class Order extends BaseEntity {
         this.totalAmount = totalPrice;
     }
 
-    public static Order create(OrderCreateRequest request, Long storeId) {
+    public static Order create(Long userId, OrderCreateRequest request, Long storeId) {
         return Order.builder()
+                .userId(userId)
                 .storeId(storeId)
                 .deliveryDate(request.deliveryDate())
                 .address(request.address())

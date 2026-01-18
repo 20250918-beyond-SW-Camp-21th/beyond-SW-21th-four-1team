@@ -6,7 +6,7 @@ const props = defineProps({
   loading: { type: Boolean, default: false }
 });
 
-const emit = defineEmits(['view-detail', 'request-inbound', 'request-outbound', 'search']);
+const emit = defineEmits(['view-detail', 'request-inbound', 'request-order', 'request-outbound', 'search']);
 
 const handleSearch = (e) => {
   emit('search', e.target.value);
@@ -21,7 +21,7 @@ const handleSearch = (e) => {
         <input type="text" placeholder="어떤 상품을 찾으시나요?" @input="handleSearch" />
       </div>
       <div class="main-btns">
-        <button class="btn-order action-btn" @click="$emit('request-inbound')">
+        <button class="btn-order action-btn" @click="$emit('request-order')">
           <span>📦 주문하기</span>
         </button>
         <button class="btn-spicy action-btn" @click="$emit('request-inbound')">
@@ -65,7 +65,7 @@ const handleSearch = (e) => {
           <div class="card-footer">
             <div class="p-price">₩{{ p.price?.toLocaleString() || '0' }}</div>
             <div class="card-footer-actions">
-              <button class="order-link" @click.stop="$emit('request-inbound', p.productName)">📦 주문</button>
+              <button class="order-link" @click.stop="$emit('request-order', p.productName)">📦 주문</button>
               <button class="detail-link">🔍 상세보기</button>
             </div>
           </div>
