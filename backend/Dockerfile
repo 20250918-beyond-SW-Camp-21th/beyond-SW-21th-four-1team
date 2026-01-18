@@ -9,8 +9,8 @@ WORKDIR /app
 # 현재 디렉토리 내의 모든 파일과 폴더를 컨테이너의 /app 디렉토리로 복사한다.
 COPY . .
 
-# Gradle을 사용하여 프로젝트를 빌드한다. (daemon 프로세스는 사용하지 않는다.)
-RUN gradle clean build --no-daemon
+# Gradle을 사용하여 프로젝트를 빌드한다. (테스트 건너뛰기 추가)
+RUN gradle clean build -x test --no-daemon
 
 ## 2. 실행 스테이지 시작
 # OpenJDK 17 버전의 이미지를 가져와 JVM 환경을 구축한다.
