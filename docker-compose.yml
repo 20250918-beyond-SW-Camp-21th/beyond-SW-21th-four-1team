@@ -1,0 +1,33 @@
+# Docker Compose 파일의 버전을 정의한다. 최신 기능과 호환성을 결정한다.
+services:
+  backend:
+    # 해당 디렉토리의 Dockerfile을 사용해 이미지를 빌드
+    build: ./backend
+    # 컨테이너 이름을 'backend'로 설정
+    container_name: backend
+    # 호스트의 12345포트를 컨테이너의 8080포트로 매핑
+    ports:
+      - "12345:8000"
+    # 동일 네트워크에 연결하여 DNS로 통신 가능
+    networks:
+      - app-public
+      - app-private
+  frontend:
+    # 해당 디렉토리의 Dockerfile을 사용해 이미지를 빌드
+    build: ./frontend
+    # 컨테이너 이름을 'frontend'로 설정
+    container_name: frontend
+    # 호스트의 5174포트를 컨테이너의 5173포트로 매핑
+    ports:
+      - "5174:5173"
+    # 동일 네트워크에 연결하여 DNS로 통신 가능
+    networks:
+      - app-public
+
+# 네트워크 정의
+networks:
+  app-public:
+    driver: bridge
+  app-private:
+    driver: bridge
+    internal: true  # 외부(호스트) 라우팅 차단

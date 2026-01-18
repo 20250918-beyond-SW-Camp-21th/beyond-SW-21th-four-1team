@@ -13,3 +13,6 @@
 
 ### Logs ###
 *.log
+
+### Kubernetes Secrets ###
+k8s/secret.yml
