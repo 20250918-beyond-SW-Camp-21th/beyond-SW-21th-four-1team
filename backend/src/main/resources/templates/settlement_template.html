@@ -2,9 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>물품 매입 명세서</title>
-
+    <title>정산 명세서</title>
     <style>
+        body { font-family: sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+        .container { width: 100%; max-width: 700px; margin: 0 auto; border: 1px solid #ddd; padding: 30px; }
+        h1 { text-align: center; color: #ff6b6b; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background-color: #fcfcfc; font-weight: bold; width: 40%; }
+        .amount { text-align: right; font-family: monospace; }
+        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #999; }
         body {
             font-family: NanumGothic, sans-serif;
             padding: 40px;
@@ -92,95 +99,51 @@
 
 <body>
 <div class="container">
+    <h1>📑 정산 명세서</h1>
 
-    <h1>물품 매입 명세서</h1>
-    <div class="subtitle">(공급받는자 보관용)</div>
-
-    <!-- 상단 정보 -->
-    <table class="info-table">
+    <table th:if="${settlement != null}">
         <tr>
-            <td width="60%">
-                <strong>발행일자:</strong>
-                <span th:text="${receipt.settlementDate}">2026-01-16</span><br/>
-                <strong>가맹점 ID:</strong>
-                <span th:text="${receipt.storeId}">1</span><br/>
-                <strong>상품 코드:</strong>
-                <span th:text="${receipt.productId}">PROD-001</span>
-            </td>
-            <td class="company-info">
-                <strong>공급자: (주) Spicy 본사</strong><br/>
-                사업자번호: 123-45-67890<br/>
-                대표이사: 홍길동
-                <span class="stamp">직인</span>
-            </td>
-        </tr>
-    </table>
-
-    <br/>
-
-    <!-- 금액 테이블 -->
-    <table class="main-table">
-        <thead>
-        <tr class="header">
-            <th>품목명</th>
-            <th>수량</th>
-            <th>공급가액</th>
-            <th>부가세(10%)</th>
+            <th>상품 ID</th>
+            <td th:text="${settlement.productId}">-</td>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <td>본사 발주 물품 대금</td>
-            <td th:text="${receipt.orderCount} + ' 건'">0 건</td>
-            <td class="amount"
-                th:text="${#numbers.formatInteger(receipt.supplyAmount, 0, 'COMMA')} + ' 원'">
-                0 원
-            </td>
-            <td class="amount"
-                th:text="${#numbers.formatInteger(receipt.taxAmount, 0, 'COMMA')} + ' 원'">
-                0 원
+            <th>총 주문 금액</th>
+            <td class="amount"><span th:text="${settlement.totalAmount}">0</span> 원</td>
+        </tr>
+        <tr>
+            <th>플랫폼 수수료 (5%)</th>
+            <td class="amount" style="color: #e74c3c;">
+                - <span th:text="${settlement.commissionAmount}">0</span> 원
             </td>
         </tr>
-
-        <tr class="total-row">
-            <td colspan="3">소계</td>
-            <td class="amount"
-                th:text="${#numbers.formatInteger(receipt.totalSettlementAmount, 0, 'COMMA')} + ' 원'">
-                0 원
+        <tr>
+            <th>최종 정산 금액</th>
+            <td class="amount" style="font-weight: bold; color: #2c3e50;">
+                <span th:text="${settlement.settlementAmount}">0</span> 원
             </td>
         </tr>
-
-        <tr class="grand-total">
-            <td colspan="3">합계 금액 (VAT 포함)</td>
-            <td class="amount"
-                th:text="${#numbers.formatInteger(receipt.totalSettlementAmount, 0, 'COMMA')} + ' 원'">
-                0 원
-            </td>
+        <tr>
+            <th>정산 상태</th>
+            <td th:text="${settlement.status}">WAITING</td>
+        </tr>
+        <tr>
+            <th>지급 예정일</th>
+            <td th:text="${settlement.payoutDate != null ? settlement.payoutDate : '미정'}">2026-01-01</td>
         </tr>
         </tbody>
     </table>
 
-    <br/>
-
-    <!-- 하단 정보 -->
-    <table class="info-table">
-        <tr>
-            <td>
-                <strong>결제 상태:</strong>
-                <span th:text="${receipt.status}">ORDERED</span>
-            </td>
-            <td style="text-align: right;">
-                <strong>대금 지불 예정일:</strong>
-                <span th:text="${receipt.payoutDate}">2026-02-10</span>
-            </td>
-        </tr>
-    </table>
-
-    <div class="footer">
-        <p>위 금액을 정히 영수(또는 청구)함</p>
-        <p>Spicy Backend 시스템 자동 발행</p>
+    <div th:unless="${settlement != null}" style="text-align: center; padding: 50px; color: red;">
+        <p>정산 데이터를 찾을 수 없습니다.</p>
     </div>
 
+    <div class="footer">
+        <p>본 문서는 Spicy 시스템에서 자동으로 생성된 확인용 명세서입니다.</p>
+        <p>생성일시: <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+    </div>
 </div>
+
 </body>
 </html>
