@@ -8,26 +8,24 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Builder
+@Schema(description = "월별 정산 응답")
 public record MonthlySettlementResponse(
         @Schema(description = "상품 식별 번호", example = "1")
         Long productId,
 
-        @Schema(description = "해당 월 주문 금액 합계", example = "5000000.00")
+        @Schema(description = "해당 월 총 매입 금액 (합계)", example = "5000000.00")
         BigDecimal totalAmount,
 
-        @Schema(description = "수수료 금액", example = "5000000.00")
-        BigDecimal commissionAmount,
+        @Schema(description = "공급가액", example = "4545455.00")
+        BigDecimal supplyAmount,
 
-        @Schema(description = "최종 정산 금액", example = "5000000.00")
-        BigDecimal settlementAmount,
+        @Schema(description = "부가세 (10%)", example = "454545.00")
+        BigDecimal taxAmount,
 
-        @Schema(description = "정산 상태", example = "WAITING")
+        @Schema(description = "정산/결제 상태 (ORDERED, PAID, COMPLETED)", example = "ORDERED")
         SettlementStatus status,
 
-        @Schema(description = "지급 예정일", example = "2026-02-10")
+        @Schema(description = "지급(결제) 완료일", example = "2026-02-10")
         LocalDate payoutDate
-
-
-
 ) {
 }

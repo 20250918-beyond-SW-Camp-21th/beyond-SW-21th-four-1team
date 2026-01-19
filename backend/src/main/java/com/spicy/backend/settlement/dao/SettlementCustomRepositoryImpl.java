@@ -18,19 +18,22 @@ public class SettlementCustomRepositoryImpl implements SettlementCustomRepositor
         if (settlements == null || settlements.isEmpty()) {
             return;
         }
-        String sql = "INSERT INTO settlement (store_id, settlement_date, order_count, total_order_amount, " +
-                "commission_amount, settlement_amount, status, created_at, updated_at, product_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?)";
+
+        String sql = "INSERT INTO settlement (store_id, settlement_date, order_count, supply_amount, " +
+                "tax_amount, total_settlement_amount, payout_date, status, product_id, pdf_url, created_at, updated_at) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
 
         jdbcTemplate.batchUpdate(sql, settlements, 1000, (ps, settlement) -> {
             ps.setObject(1, settlement.getStoreId());
             ps.setDate(2, Date.valueOf(settlement.getSettlementDate()));
             ps.setObject(3, settlement.getOrderCount());
-            ps.setBigDecimal(4, settlement.getTotalOrderAmount());
-            ps.setBigDecimal(5, settlement.getCommissionAmount());
-            ps.setBigDecimal(6, settlement.getSettlementAmount());
-            ps.setString(7, settlement.getStatus().name());
-            ps.setLong(8,settlement.getProductId());
+            ps.setBigDecimal(4, settlement.getSupplyAmount());
+            ps.setBigDecimal(5, settlement.getTaxAmount());
+            ps.setBigDecimal(6, settlement.getTotalSettlementAmount());
+            ps.setDate(7, settlement.getPayoutDate() != null ? Date.valueOf(settlement.getPayoutDate()) : null);
+            ps.setString(8, settlement.getStatus().name());
+            ps.setLong(9, settlement.getProductId());
+            ps.setString(10, settlement.getPdfUrl());
         });
     }
 }

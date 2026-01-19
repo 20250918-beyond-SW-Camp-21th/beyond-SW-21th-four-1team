@@ -1,14 +1,21 @@
 package com.spicy.backend.settlement.application;
 
 import com.itextpdf.html2pdf.HtmlConverter;
+import com.spicy.backend.settlement.dto.response.DailySettlementResponse;
 import com.spicy.backend.settlement.dto.response.MonthlySettlementResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 
 @Slf4j
 @Service
@@ -17,28 +24,62 @@ public class SettlementFileService {
 
     private final SpringTemplateEngine templateEngine;
 
-    //월별 정산 내역 PDF 생성 및 업로드, 문서 생성 & 파일 저장 반영
-    public byte[] createAndUploadSettlementPdf(MonthlySettlementResponse data) {
-        try {
-            // 1. Thymeleaf를 이용한 HTML 생성
-            Context context = new Context();
-            context.setVariable("settlement", data);
-            String htmlContent = templateEngine.process("settlement_template", context);
+    @Value("${file.upload-dir:./uploads/settlements}")
+    private String uploadDir;
 
-            // 2. HTML을 PDF로 변환, iText 사용
-            try (ByteArrayOutputStream target = new ByteArrayOutputStream()) {
-                HtmlConverter.convertToPdf(htmlContent, target);
+    /**
+     * [컨트롤러용] 일별 PDF 바이트 생성 (즉시 다운로드용)
+     */
+    public byte[] createDailySettlementPdf(DailySettlementResponse data, LocalDate date) {
+        Context context = new Context();
+        context.setVariable("type", "DAILY");
+        context.setVariable("receipt", data);
+        context.setVariable("targetDate", date);
+        return generatePdfBytes("settlement_template", context);
+    }
 
-                // 로그 메시지 변경 (URL 반환 -> PDF 데이터 반환)
-                log.info("PDF 생성 완료: totalAmount={}, size={} bytes",
-                        data.totalAmount(), target.size());
+    /**
+     * [컨트롤러용] 월별 PDF 바이트 생성 (즉시 다운로드용)
+     */
+    public byte[] createMonthlySettlementPdf(MonthlySettlementResponse data, String yearMonth) {
+        Context context = new Context();
+        context.setVariable("type", "MONTHLY");
+        context.setVariable("receipt", data);
+        context.setVariable("targetDate", yearMonth);
+        return generatePdfBytes("settlement_template", context);
+    }
 
-                //실제 생성된 PDF 파일 데이터(byte[])를 반환
-                return target.toByteArray();
-            }
+    /**
+     * [서비스용] 일별 PDF 생성 및 로컬 저장 (경로 반환)
+     */
+    public String saveDailySettlementPdf(DailySettlementResponse data, LocalDate date) {
+        String fileName = "daily_receipt_" + date + "_" + System.currentTimeMillis() + ".pdf";
+        byte[] content = createDailySettlementPdf(data, date);
+        return storeFile(content, fileName);
+    }
 
+    private byte[] generatePdfBytes(String templateName, Context context) {
+        try (ByteArrayOutputStream target = new ByteArrayOutputStream()) {
+            String htmlContent = templateEngine.process(templateName, context);
+            HtmlConverter.convertToPdf(htmlContent, target);
+            return target.toByteArray();
         } catch (Exception e) {
-            throw new RuntimeException("정산 PDF 생성 실패", e);
+            log.error("PDF 바이트 생성 실패: {}", e.getMessage());
+            throw new RuntimeException("PDF 변환 중 오류가 발생했습니다.");
+        }
+    }
+
+    private String storeFile(byte[] content, String fileName) {
+        try {
+            Path directoryPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+            Files.createDirectories(directoryPath);
+            Path filePath = directoryPath.resolve(fileName);
+            Files.write(filePath, content);
+            log.info("파일 저장 성공: {}", filePath);
+            return filePath.toString();
+        } catch (IOException e) {
+            log.error("파일 시스템 저장 실패: {}", e.getMessage());
+            throw new RuntimeException("파일 저장 중 오류가 발생했습니다.");
         }
     }
 }
