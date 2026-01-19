@@ -114,7 +114,9 @@ public class SettlementService {
                 storeId, com.spicy.backend.order.enums.Status.DELIVERED,
                 targetDate.atStartOfDay(), targetDate.atTime(LocalTime.MAX));
 
-        if (orders.isEmpty()) throw new BusinessException(SettlementErrorCode.SETTLEMENT_NOT_FOUND);
+        if (orders.isEmpty()) {
+            throw new BusinessException(SettlementErrorCode.NO_ORDERS_FOR_SETTLEMENT);
+        }
 
         BigDecimal totalAmount = orders.stream().map(Order::getTotalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal divisor = new BigDecimal("1.1");
