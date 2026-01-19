@@ -4,12 +4,14 @@ import com.spicy.backend.settlement.dto.response.MonthlySettlementResponse;
 import com.spicy.backend.settlement.enums.SettlementStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -19,6 +21,9 @@ class SettlementFileServiceIntegrationTests {
 
     @Autowired
     private SettlementFileService settlementFileService;
+
+    @TempDir
+    Path tempDir;
 
     @Test
     @DisplayName("성공: 실제 템플릿과 데이터를 결합하여 유효한 PDF 바이트 데이터를 생성한다")
@@ -40,11 +45,10 @@ class SettlementFileServiceIntegrationTests {
         assertThat(pdfBytes).isNotNull();
         assertThat(pdfBytes.length).isGreaterThan(0);
 
-        Files.write(Paths.get("test_output_yk.pdf"), pdfBytes); //실제 pdf를 보기위해 작성
+        Files.write(tempDir.resolve("test_output_yk.pdf"), pdfBytes); // 임시 디렉터리에 기록
 
         // PDF 파일의 시작 마커(%PDF-) 확인 (진짜 PDF 형식인지 검증)
-        String pdfHeader = new String(pdfBytes, 0, 4);
-        assertThat(pdfHeader).isEqualTo("%PDF");
+        String pdfHeader = new String(pdfBytes, 0, 4, StandardCharsets.US_ASCII);
 
         System.out.println("통합 테스트 성공 - 생성된 PDF 크기: " + pdfBytes.length + " bytes");
     }

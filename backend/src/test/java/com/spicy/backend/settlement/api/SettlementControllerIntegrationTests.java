@@ -11,6 +11,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -41,7 +42,7 @@ class SettlementControllerIntegrationTests {
                 .andExpect(result -> {
                     byte[] content = result.getResponse().getContentAsByteArray();
                     // 진짜 PDF 파일이 생성되어 바이트가 채워졌는지 확인 (0보다 커야 함)
-                    assert content.length > 0;
+                    assertThat(content).isNotEmpty();
                 });
     }
 }
