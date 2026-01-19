@@ -62,6 +62,9 @@ dependencies {
 
     // Thymeleaf (HTML 템플릿 렌더링 → PDF 생성용)
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // 테스트 코드를 위한 인메모리 DB
+    testImplementation 'com.h2database:h2'
 }
 
 tasks.named('test') {
