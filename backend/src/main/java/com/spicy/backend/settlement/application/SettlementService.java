@@ -149,7 +149,8 @@ public class SettlementService {
      * [추가] 정산 내역 목록 조회 (컨트롤러와 맞물림)
      */
     public List<DailySettlementResponse> getSettlementList(Long storeId) {
-        List<Settlement> settlements = settlementRepository.findAll(); // 필요시 storeId 조건 추가
+        List<Settlement> settlements =
+                settlementRepository.findAllByStoreIdOrderBySettlementDateDesc(storeId);
         return settlements.stream()
                 .map(s -> DailySettlementResponse.builder()
                         .productId(s.getProductId())
