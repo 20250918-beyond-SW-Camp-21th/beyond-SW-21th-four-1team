@@ -1,34 +1,17 @@
-const BASE_URL = '/api/v1/settlements';
+import api from '@/api/axios';
 
-const getHeaders = () => {
-    return {
-        'Content-Type': 'application/json',
-    };
-};
+const API_BASE_URL = '/settlements';
 
 export const settlementApi = {
     // 일별 정산 조회
     async getDailySettlement(storeId, productId, date) {
         console.log(`Fetching daily settlement for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            const response = await fetch(`${BASE_URL}/daily?storeId=${storeId}&productId=${productId}&date=${date}`, {
-                method: 'GET',
-                headers: getHeaders(),
+            const response = await api.get(`${API_BASE_URL}/daily`, {
+                params: { storeId, productId, date }
             });
-
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("text/html")) {
-                throw new Error("Received HTML response. CORS/Proxy issue likely. Please RESTART 'npm run dev'.");
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `Network response was not ok: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("Daily Settlement API Response:", data);
-            return data.data || data;
+            console.log("Daily Settlement API Response:", response.data);
+            return response.data;
         } catch (error) {
             console.error('Error fetching daily settlement:', error);
             throw error;
@@ -39,26 +22,58 @@ export const settlementApi = {
     async getMonthlySettlement(storeId, productId, yearMonth) {
         console.log(`Fetching monthly settlement for store ${storeId}, product ${productId} for ${yearMonth}...`);
         try {
-            const response = await fetch(`${BASE_URL}/monthly?storeId=${storeId}&productId=${productId}&yearMonth=${yearMonth}`, {
-                method: 'GET',
-                headers: getHeaders(),
+            const response = await api.get(`${API_BASE_URL}/monthly`, {
+                params: { storeId, productId, yearMonth }
             });
-
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.includes("text/html")) {
-                throw new Error("Received HTML response. CORS/Proxy issue likely. Please RESTART 'npm run dev'.");
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `Network response was not ok: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("Monthly Settlement API Response:", data);
-            return data.data || data;
+            console.log("Monthly Settlement API Response:", response.data);
+            return response.data;
         } catch (error) {
             console.error('Error fetching monthly settlement:', error);
+            throw error;
+        }
+    },
+
+    // 정산 목록 조회
+    async getSettlementList(storeId) {
+        console.log(`Fetching settlement list for store ${storeId}...`);
+        try {
+            const response = await api.get(`${API_BASE_URL}/list`, {
+                params: { storeId }
+            });
+            console.log("Settlement List API Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching settlement list:', error);
+            throw error;
+        }
+    },
+
+    // 정산 포함 주문 상세 조회
+    async getSettlementOrderDetails(storeId, date) {
+        console.log(`Fetching settlement order details for store ${storeId} on ${date}...`);
+        try {
+            const response = await api.get(`${API_BASE_URL}/details`, {
+                params: { storeId, date }
+            });
+            console.log("Settlement Order Details API Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching settlement order details:', error);
+            throw error;
+        }
+    },
+
+    // 기간별 정산 통계 조회
+    async getSettlementStats(storeId, startDate, endDate) {
+        console.log(`Fetching settlement stats for store ${storeId} from ${startDate} to ${endDate}...`);
+        try {
+            const response = await api.get(`${API_BASE_URL}/stats`, {
+                params: { storeId, startDate, endDate }
+            });
+            console.log("Settlement Stats API Response:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching settlement stats:', error);
             throw error;
         }
     },
@@ -67,19 +82,13 @@ export const settlementApi = {
     async downloadMonthlyPdf(storeId, productId, yearMonth) {
         console.log(`Downloading monthly PDF for store ${storeId}, product ${productId} for ${yearMonth}...`);
         try {
-            const response = await fetch(`${BASE_URL}/monthly/download?storeId=${storeId}&productId=${productId}&yearMonth=${yearMonth}`, {
-                method: 'GET',
+            const response = await api.get(`${API_BASE_URL}/monthly/download`, {
+                params: { storeId, productId, yearMonth },
+                responseType: 'blob'
             });
 
-            if (!response.ok) {
-                throw new Error(`PDF download failed: ${response.status}`);
-            }
-
-            // Get the blob data
-            const blob = await response.blob();
-
             // Create a download link
-            const url = window.URL.createObjectURL(blob);
+            const url = window.URL.createObjectURL(new Blob([response.data]));
             const a = document.createElement('a');
             a.href = url;
             a.download = `월별영수증_${yearMonth}.pdf`;
@@ -98,23 +107,17 @@ export const settlementApi = {
         }
     },
 
-    // 일별 정산 PDF 다운로드 (백엔드 API 사용)
+    // 일별 정산 PDF 다운로드
     async downloadDailyPdf(storeId, productId, date) {
         console.log(`Downloading daily PDF for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            const response = await fetch(`${BASE_URL}/daily/download?storeId=${storeId}&productId=${productId}&date=${date}`, {
-                method: 'GET',
+            const response = await api.get(`${API_BASE_URL}/daily/download`, {
+                params: { storeId, productId, date },
+                responseType: 'blob'
             });
 
-            if (!response.ok) {
-                throw new Error(`PDF download failed: ${response.status}`);
-            }
-
-            // Get the blob data
-            const blob = await response.blob();
-
             // Create a download link
-            const url = window.URL.createObjectURL(blob);
+            const url = window.URL.createObjectURL(new Blob([response.data]));
             const a = document.createElement('a');
             a.href = url;
             a.download = `일별영수증_${date}.pdf`;
@@ -133,23 +136,56 @@ export const settlementApi = {
         }
     },
 
+    // ID로 PDF 다운로드
+    async downloadPdfById(settlementId) {
+        console.log(`Downloading PDF for settlement ID ${settlementId}...`);
+        try {
+            const response = await api.get(`${API_BASE_URL}/${settlementId}/download`, {
+                responseType: 'blob'
+            });
+
+            // Extract filename from Content-Disposition header or use default
+            const contentDisposition = response.headers['content-disposition'];
+            let fileName = `정산영수증_${settlementId}.pdf`;
+
+            if (contentDisposition) {
+                const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                if (fileNameMatch && fileNameMatch[1]) {
+                    fileName = fileNameMatch[1].replace(/['"]/g, '');
+                }
+            }
+
+            // Create a download link
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            console.log("PDF downloaded successfully by ID");
+            return true;
+        } catch (error) {
+            console.error('Error downloading PDF by ID:', error);
+            throw error;
+        }
+    },
+
     // 일일 정산 생성
     async createSettlement(storeId, productId, date) {
         console.log(`Creating settlement for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            const response = await fetch(`${BASE_URL}/generate`, {
-                method: 'POST',
-                headers: getHeaders(),
-                body: JSON.stringify({ storeId, productId, date }),
+            const response = await api.post(`${API_BASE_URL}/generate`, {
+                storeId,
+                productId,
+                date
             });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `Network response was not ok: ${response.status}`);
-            }
-
-            console.log("Settlement created successfully");
-            return true;
+            console.log("Settlement created successfully:", response.data);
+            return response.data;
         } catch (error) {
             console.error('Error creating settlement:', error);
             throw error;
