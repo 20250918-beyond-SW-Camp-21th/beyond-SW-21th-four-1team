@@ -13,7 +13,7 @@ const emit = defineEmits(['filter-change']);
 
 // Filter state
 const storeId = ref(1);
-const productId = ref(1);
+const productId = ref(1); // 내부적으로 1로 고정
 const selectedDate = ref(new Date().toISOString().split('T')[0]); // YYYY-MM-DD
 const selectedMonth = ref(new Date().toISOString().slice(0, 7)); // YYYY-MM
 const selectedStatus = ref('ALL'); // ALL, ORDERED, PAID, COMPLETED
@@ -52,17 +52,6 @@ const handleFilter = () => {
           type="number" 
           min="1"
           placeholder="가맹점 번호를 입력하세요"
-        />
-      </div>
-
-      <div class="filter-group">
-        <label for="productId">상품 ID</label>
-        <input 
-          id="productId"
-          v-model.number="productId" 
-          type="number" 
-          min="1"
-          placeholder="상품 번호를 입력하세요"
         />
       </div>
 
