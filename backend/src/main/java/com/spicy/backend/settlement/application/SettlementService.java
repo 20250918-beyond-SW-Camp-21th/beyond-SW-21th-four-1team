@@ -123,6 +123,11 @@ public class SettlementService {
 
         BigDecimal commissionAmount = totalAmount.multiply(new BigDecimal("0.05")).setScale(0, RoundingMode.HALF_UP);
 
+        // PDF 먼저 생성
+                DailySettlementResponse pdfData = DailySettlementResponse.builder()
+                              .productId(productId).orderCount(orders.size()).dailyAmount(totalAmount).build();
+                String savedLocalPath = settlementFileService.saveDailySettlementPdf(pdfData, targetDate);
+
         Settlement settlement = Settlement.builder()
                 .storeId(storeId)
                 .settlementDate(targetDate)
@@ -133,16 +138,19 @@ public class SettlementService {
                 .totalOrderAmount(totalAmount)
                 .status(SettlementStatus.ORDERED)
                 .commissionAmount(commissionAmount)
-                .productId(productId).build();
+                .productId(productId)
+                .pdfUrl(savedLocalPath)
+                .build();
+
 
         settlementRepository.save(settlement);
 
-        // PDF 생성 및 경로 업데이트 (맞물림 수정)
+        /*// PDF 생성 및 경로 업데이트 (맞물림 수정)
         DailySettlementResponse pdfData = DailySettlementResponse.builder()
                 .productId(productId).orderCount(orders.size()).dailyAmount(totalAmount).build();
 
         String savedLocalPath = settlementFileService.saveDailySettlementPdf(pdfData, targetDate);
-        settlement.updatePdfUrl(savedLocalPath);
+        settlement.updatePdfUrl(savedLocalPath);*/
     }
 
     /**
