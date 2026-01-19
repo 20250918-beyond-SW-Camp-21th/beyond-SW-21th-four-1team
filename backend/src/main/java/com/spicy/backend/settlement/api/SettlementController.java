@@ -42,7 +42,7 @@ public class SettlementController {
 
     @Operation(
             summary = "일별 매입 내역 조회",
-            description = "특정 날짜의 본사 발주 건수, 일 매입 금액, 해당 월 누적 매입 금액을 조회합니다."
+            description = "특정 날짜의 본사 발주 건수, 일 매입 금액, 해당 월 누적 매입 금액과 상세 품목 리스트를 조회합니다."
     )
     @GetMapping("/daily")
     public ResponseEntity<DailySettlementResponse> getDailySettlement(
@@ -60,10 +60,10 @@ public class SettlementController {
     public ResponseEntity<byte[]> downloadDailySettlementPdf(
             @Valid DailySettlementRequest request) {
 
-        // 1. 일별 데이터 조회
+        // 1. 일별 데이터 조회 (상세 품목 포함)
         DailySettlementResponse responseData = settlementService.getDailySettlement(request);
 
-        // 2. 일별 PDF 생성 (SettlementFileService에 해당 메서드가 구현되어 있어야 함)
+        // 2. 일별 PDF 생성
         byte[] pdfFile = settlementFileService.createDailySettlementPdf(responseData, request.date());
 
         // 3. 응답 처리
@@ -72,7 +72,7 @@ public class SettlementController {
 
     @Operation(
             summary = "월별 매입 정산 조회",
-            description = "특정 월의 총 매입 금액, 공급가액, 부가세, 결제 상태를 조회합니다."
+            description = "특정 월의 총 매입 금액, 공급가액, 부가세, 결제 상태 및 월간 전체 품목 상세를 조회합니다."
     )
     @GetMapping("/monthly")
     public ResponseEntity<MonthlySettlementResponse> getMonthlySettlement(
@@ -89,7 +89,7 @@ public class SettlementController {
     public ResponseEntity<byte[]> downloadMonthlySettlementPdf(
             @Valid MonthlySettlementRequest request) {
 
-        // 1. 월별 데이터 조회
+        // 1. 월별 데이터 조회 (상세 품목 포함)
         MonthlySettlementResponse responseData = settlementService.getMonthlySettlement(request);
 
         // 2. 월별 PDF 생성
@@ -107,7 +107,6 @@ public class SettlementController {
     public ResponseEntity<List<OrderResponse>> getSettlementOrderDetails(
             @RequestParam Long storeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        // SettlementService에 getOrdersBySettlementDate 메서드 추가 필요
         List<OrderResponse> response = settlementService.getOrdersBySettlementDate(storeId, date);
         return ResponseEntity.ok(response);
     }
@@ -121,35 +120,32 @@ public class SettlementController {
             @RequestParam Long storeId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        // 기간별 조회를 위한 서비스 로직 호출
         List<DailySettlementResponse> stats = settlementService.getSettlementStats(storeId, startDate, endDate);
         return ResponseEntity.ok(stats);
     }
 
     @Operation(
             summary = "본사 발주 기반 매입 정산 생성",
-            description = "특정 날짜에 완료된 발주 데이터를 수집하여 정산 생성 및 PDF를 MinIO에 자동 업로드합니다."
+            description = "특정 날짜에 완료된 발주 데이터를 모두 수집하여 통합 정산을 생성하고 PDF를 로컬에 저장합니다."
     )
     @PostMapping("/generate")
     public ResponseEntity<String> createSettlement(
             @Valid @RequestBody DailySettlementRequest request
     ) {
-        // 기존 createSettlement가 내부적으로 SettlementFileService를 호출해 pdfUrl을 생성하도록 수정됨
-        settlementService.createSettlement(request.storeId(), request.productId(), request.date());
+        // [수정] 특정 productId가 아닌 가맹점 일괄 정산을 위해 storeId와 date만 전달
+        settlementService.createSettlement(request.storeId(), request.date());
         return ResponseEntity.ok("정산 데이터 및 PDF 영수증 생성 완료");
     }
 
-    @Operation(summary = "정산 내역 목록 조회", description = "가맹점의 전체 정산 내역을 조회합니다.")
+    @Operation(summary = "정산 내역 목록 조회", description = "가맹점의 전체 정산 내역 요약을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<List<DailySettlementResponse>> getSettlementList(@RequestParam Long storeId) {
-        // 서비스에 추가된 getSettlementList 호출
         return ResponseEntity.ok(settlementService.getSettlementList(storeId));
     }
 
-    @Operation(summary = "영수증 다운로드", description = "정산 ID를 통해 로컬에 저장된 PDF를 다운로드합니다.")
+    @Operation(summary = "영수증 다운로드", description = "정산 ID를 통해 저장된 PDF 영수증을 다운로드합니다.")
     @GetMapping("/{settlementId}/download")
     public ResponseEntity<Resource> downloadStoredPdf(@PathVariable Long settlementId) {
-        // 서비스의 getPdfFileAsResource 호출
         Resource resource = settlementService.getPdfFileAsResource(settlementId);
 
         return ResponseEntity.ok()
@@ -165,7 +161,6 @@ public class SettlementController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
 
-        // 한글 파일명 깨짐 방지를 위한 설정
         ContentDisposition contentDisposition = ContentDisposition.attachment()
                 .filename(fileName, StandardCharsets.UTF_8)
                 .build();

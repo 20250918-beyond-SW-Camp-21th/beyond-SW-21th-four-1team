@@ -16,7 +16,7 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-@SpringBootTest // 실제 Bean(SpringTemplateEngine 등)을 모두 로드하는 통합 테스트
+@SpringBootTest
 class SettlementFileServiceIntegrationTests {
 
     @Autowired
@@ -27,27 +27,22 @@ class SettlementFileServiceIntegrationTests {
 
     @Test
     @DisplayName("성공: 실제 템플릿과 데이터를 결합하여 유효한 PDF 바이트 데이터를 생성한다")
-    void createAndUploadSettlementPdf_IntegrationSuccess() throws Exception {
-        // given: 실제 템플릿에 들어갈 데이터 준비
+    void createMonthlyPdf_IntegrationSuccess() throws Exception {
         MonthlySettlementResponse data = MonthlySettlementResponse.builder()
                 .totalAmount(new BigDecimal("2500000"))
-                .supplyAmount(new BigDecimal("2272727")) // 예시값 (원하면 정확히 계산해도 됨)
+                .supplyAmount(new BigDecimal("2272727"))
                 .taxAmount(new BigDecimal("227273"))
                 .status(SettlementStatus.ORDERED)
                 .payoutDate(LocalDate.of(2026, 2, 10))
-                .productId(101L)
                 .build();
 
-        // when: 실제 서비스 로직 수행 (Thymeleaf 렌더링 + iText 변환)
         byte[] pdfBytes = settlementFileService.createMonthlySettlementPdf(data, "2026-01");
 
-        // then: 생성된 PDF 검증
         assertThat(pdfBytes).isNotNull();
         assertThat(pdfBytes.length).isGreaterThan(0);
 
-        Files.write(tempDir.resolve("test_output_yk.pdf"), pdfBytes); // 임시 디렉터리에 기록
+        Files.write(tempDir.resolve("test_output.pdf"), pdfBytes);
 
-        // PDF 파일의 시작 마커(%PDF-) 확인 (진짜 PDF 형식인지 검증)
         String pdfHeader = new String(pdfBytes, 0, 4, StandardCharsets.US_ASCII);
         assertThat(pdfHeader).isEqualTo("%PDF");
     }

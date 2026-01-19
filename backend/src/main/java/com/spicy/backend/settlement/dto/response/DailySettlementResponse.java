@@ -23,3 +23,4 @@ public record DailySettlementResponse(
         @Schema(description = "해당 월 누적 매입 금액", example = "4500000.00")
         BigDecimal monthlyAccumulatedAmount
 ) {}
+

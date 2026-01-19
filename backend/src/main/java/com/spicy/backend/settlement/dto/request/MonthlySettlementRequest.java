@@ -10,9 +10,9 @@ public record MonthlySettlementRequest(
         @Schema(description = "가맹점 식별 번호", example = "1")
         Long storeId,
 
-        @NotNull
+        /*@NotNull
         @Schema(description = "상품 식별 번호",example = "1")
-        Long productId,
+        Long productId,*/
 
         @NotBlank(message = "조회 연월은 필수입니다.")
         @Schema(description = "조회 연월(YYYY-MM)", example = "2026-01", type = "string")

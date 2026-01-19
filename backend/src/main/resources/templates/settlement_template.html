@@ -180,10 +180,6 @@
     <div th:if="${type == 'DAILY' and receipt != null}">
         <div class="info-section">
             <div class="info-row">
-                <div class="info-label">상품 ID</div>
-                <div class="info-value" th:text="${receipt.productId}">1</div>
-            </div>
-            <div class="info-row">
                 <div class="info-label">정산 날짜</div>
                 <div class="info-value" th:text="${targetDate}">2026-01-19</div>
             </div>
@@ -220,10 +216,6 @@
     <!-- 월별 정산 내용 -->
     <div th:if="${type == 'MONTHLY' and receipt != null}">
         <div class="info-section">
-            <div class="info-row">
-                <div class="info-label">상품 ID</div>
-                <div class="info-value" th:text="${receipt.productId}">1</div>
-            </div>
             <div class="info-row">
                 <div class="info-label">정산 기간</div>
                 <div class="info-value" th:text="${targetDate}">2026-01</div>

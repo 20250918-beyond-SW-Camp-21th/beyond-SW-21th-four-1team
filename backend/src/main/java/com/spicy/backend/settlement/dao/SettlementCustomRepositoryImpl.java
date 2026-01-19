@@ -32,7 +32,7 @@ public class SettlementCustomRepositoryImpl implements SettlementCustomRepositor
             ps.setBigDecimal(6, settlement.getTotalSettlementAmount());
             ps.setDate(7, settlement.getPayoutDate() != null ? Date.valueOf(settlement.getPayoutDate()) : null);
             ps.setString(8, settlement.getStatus().name());
-            ps.setLong(9, settlement.getProductId());
+            ps.setObject(9, settlement.getProductId());
             ps.setString(10, settlement.getPdfUrl());
         });
     }
