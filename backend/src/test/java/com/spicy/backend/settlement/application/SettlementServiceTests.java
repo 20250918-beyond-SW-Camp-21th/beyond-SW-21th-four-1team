@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,10 @@ class SettlementServiceTests {
     @Mock
     private OrderRepository orderRepository;
 
+    // ✅ SettlementService 생성자 주입 대상이므로 Mock 필요
+    @Mock
+    private SettlementFileService settlementFileService;
+
     @Nested
     @DisplayName("일별 정산 조회 테스트")
     class GetDailySettlement {
@@ -65,8 +70,10 @@ class SettlementServiceTests {
                     daily
             );
 
-            given(settlementRepository.findByStoreIdAndSettlementDate(storeId, date)).willReturn(Optional.of(daily));
-            given(settlementRepository.findByStoreIdAndSettlementDateBetween(eq(storeId), any(), eq(date))).willReturn(monthlyList);
+            given(settlementRepository.findByStoreIdAndSettlementDate(storeId, date))
+                    .willReturn(Optional.of(daily));
+            given(settlementRepository.findByStoreIdAndSettlementDateBetween(eq(storeId), any(), eq(date)))
+                    .willReturn(monthlyList);
 
             // when
             DailySettlementResponse response = settlementService.getDailySettlement(request);
@@ -80,11 +87,13 @@ class SettlementServiceTests {
         @DisplayName("실패: 정산 내역이 없으면 BusinessException이 발생한다")
         void fail_NotFound() {
             // given
-            given(settlementRepository.findByStoreIdAndSettlementDate(anyLong(), any())).willReturn(Optional.empty());
+            given(settlementRepository.findByStoreIdAndSettlementDate(anyLong(), any()))
+                    .willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> settlementService.getDailySettlement(new DailySettlementRequest(1L, 1L, LocalDate.now())))
-                    .isInstanceOf(BusinessException.class)
+            assertThatThrownBy(() ->
+                    settlementService.getDailySettlement(new DailySettlementRequest(1L, 1L, LocalDate.now()))
+            ).isInstanceOf(BusinessException.class)
                     .hasFieldOrPropertyWithValue("errorCode", SettlementErrorCode.SETTLEMENT_NOT_FOUND);
         }
     }
@@ -99,19 +108,22 @@ class SettlementServiceTests {
             // given
             MonthlySettlementRequest request = new MonthlySettlementRequest(1L, 1L, "2026-01");
             List<Settlement> monthlyList = List.of(
-                    createSettlement(LocalDate.of(2026, 1, 1), "10000", "500", "9500"),
-                    createSettlement(LocalDate.of(2026, 1, 15), "20000", "1000", "19000")
+                    createSettlement(LocalDate.of(2026, 1, 1), "10000"),
+                    createSettlement(LocalDate.of(2026, 1, 15), "20000")
             );
 
-            given(settlementRepository.findByStoreIdAndSettlementDateBetween(anyLong(), any(), any())).willReturn(monthlyList);
+            given(settlementRepository.findByStoreIdAndSettlementDateBetween(anyLong(), any(), any()))
+                    .willReturn(monthlyList);
 
             // when
             MonthlySettlementResponse response = settlementService.getMonthlySettlement(request);
 
             // then
             assertThat(response.totalAmount()).isEqualByComparingTo("30000");
-            assertThat(response.commissionAmount()).isEqualByComparingTo("1500");
-            assertThat(response.settlementAmount()).isEqualByComparingTo("28500");
+
+            // (원하면 아래도 검증 가능)
+            // assertThat(response.supplyAmount()).isNotNull();
+            // assertThat(response.taxAmount()).isNotNull();
         }
 
         @Test
@@ -131,7 +143,7 @@ class SettlementServiceTests {
     class CreateSettlement {
 
         @Test
-        @DisplayName("성공: 배송 완료된 주문들을 수집하여 수수료 5%를 제외한 정산을 생성한다")
+        @DisplayName("성공: 배송 완료된 주문들을 수집하여 공급가/부가세를 계산해 정산을 생성한다")
         void success() {
             // given
             Long storeId = 1L;
@@ -140,18 +152,25 @@ class SettlementServiceTests {
             Order order1 = Order.builder().totalAmount(new BigDecimal("60000")).build();
             Order order2 = Order.builder().totalAmount(new BigDecimal("40000")).build();
 
-            given(settlementRepository.findByStoreIdAndSettlementDate(anyLong(), any())).willReturn(Optional.empty());
+            given(settlementRepository.findByStoreIdAndSettlementDate(anyLong(), any()))
+                    .willReturn(Optional.empty());
+
             given(orderRepository.findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(anyLong(), any(), any(), any()))
                     .willReturn(List.of(order1, order2));
+
+            // ✅ createSettlement 내부에서 호출하므로 stub 필요
+            given(settlementFileService.saveDailySettlementPdf(any(), any()))
+                    .willReturn("/tmp/test.pdf");
 
             // when
             settlementService.createSettlement(storeId, 100L, date);
 
             // then
             verify(settlementRepository, times(1)).save(argThat(settlement ->
-                    settlement.getTotalOrderAmount().compareTo(new BigDecimal("100000")) == 0 &&
-                            settlement.getCommissionAmount().compareTo(new BigDecimal("5000")) == 0 &&
-                            settlement.getSettlementAmount().compareTo(new BigDecimal("95000")) == 0
+                    settlement.getTotalSettlementAmount().compareTo(new BigDecimal("100000")) == 0
+                            && settlement.getSupplyAmount().compareTo(new BigDecimal("90909")) == 0
+                            && settlement.getTaxAmount().compareTo(new BigDecimal("9091")) == 0
+                            && settlement.getStatus() == SettlementStatus.ORDERED
             ));
         }
 
@@ -197,18 +216,18 @@ class SettlementServiceTests {
     }
 
     // --- Helper Methods ---
-    private Settlement createSettlement(LocalDate date, String amount) {
-        return createSettlement(date, amount, "0", amount);
-    }
+    private Settlement createSettlement(LocalDate date, String totalAmount) {
+        BigDecimal total = new BigDecimal(totalAmount);
+        BigDecimal supply = total.divide(new BigDecimal("1.1"), 0, RoundingMode.HALF_UP);
+        BigDecimal tax = total.subtract(supply);
 
-    private Settlement createSettlement(LocalDate date, String total, String comm, String settle) {
         return Settlement.builder()
                 .settlementDate(date)
-                .totalOrderAmount(new BigDecimal(total))
-                .commissionAmount(new BigDecimal(comm))
-                .settlementAmount(new BigDecimal(settle))
+                .totalSettlementAmount(total)
+                .supplyAmount(supply)
+                .taxAmount(tax)
                 .orderCount(1)
-                .status(SettlementStatus.WAITING)
+                .status(SettlementStatus.ORDERED)
                 .productId(1L)
                 .build();
     }

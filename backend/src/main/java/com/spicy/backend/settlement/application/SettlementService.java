@@ -121,10 +121,19 @@ public class SettlementService {
         BigDecimal supplyAmount = totalAmount.divide(divisor, 0, RoundingMode.HALF_UP);
         BigDecimal taxAmount = totalAmount.subtract(supplyAmount);
 
+        BigDecimal commissionAmount = totalAmount.multiply(new BigDecimal("0.05")).setScale(0, RoundingMode.HALF_UP);
+
         Settlement settlement = Settlement.builder()
-                .storeId(storeId).settlementDate(targetDate).totalSettlementAmount(totalAmount)
-                .supplyAmount(supplyAmount).taxAmount(taxAmount).orderCount(orders.size())
-                .status(SettlementStatus.ORDERED).productId(productId).build();
+                .storeId(storeId)
+                .settlementDate(targetDate)
+                .totalSettlementAmount(totalAmount)
+                .supplyAmount(supplyAmount)
+                .taxAmount(taxAmount)
+                .orderCount(orders.size())
+                .totalOrderAmount(totalAmount)
+                .status(SettlementStatus.ORDERED)
+                .commissionAmount(commissionAmount)
+                .productId(productId).build();
 
         settlementRepository.save(settlement);
 

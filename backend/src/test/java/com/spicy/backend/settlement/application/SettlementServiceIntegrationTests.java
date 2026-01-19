@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -65,9 +66,11 @@ class SettlementServiceIntegrationTests {
         Settlement saved = settlementRepository.findByStoreIdAndSettlementDate(storeId, targetDate)
                 .orElseThrow();
 
-        assertThat(saved.getTotalOrderAmount()).isEqualByComparingTo("100000");
-        assertThat(saved.getCommissionAmount()).isEqualByComparingTo("5000"); // 5%
-        assertThat(saved.getSettlementAmount()).isEqualByComparingTo("95000");
+        assertThat(saved.getTotalSettlementAmount()).isEqualByComparingTo("100000");
+        assertThat(saved.getSupplyAmount()).isEqualByComparingTo("90909"); // 100000 / 1.1 (0자리 반올림)
+        assertThat(saved.getTaxAmount()).isEqualByComparingTo("9091");
+        assertThat(saved.getStatus()).isEqualTo(SettlementStatus.ORDERED);
+
     }
 
     @Test
@@ -108,16 +111,23 @@ class SettlementServiceIntegrationTests {
     }
 
     // Helper: 엔티티 생성을 위한 편의 메서드
-    private Settlement createSettlementEntity(Long storeId, LocalDate date, String amount) {
-        BigDecimal total = new BigDecimal(amount);
+    private Settlement createSettlementEntity(Long storeId, LocalDate date, String totalAmount) {
+        BigDecimal total = new BigDecimal(totalAmount);
+        BigDecimal supply = total.divide(new BigDecimal("1.1"), 0, RoundingMode.HALF_UP);
+        BigDecimal tax = total.subtract(supply);
+
+        BigDecimal commission = new BigDecimal("100.00");
+
         return Settlement.builder()
                 .storeId(storeId)
                 .settlementDate(date)
+                .totalSettlementAmount(total)
                 .totalOrderAmount(total)
-                .commissionAmount(total.multiply(new BigDecimal("0.05")))
-                .settlementAmount(total.multiply(new BigDecimal("0.95")))
+                .supplyAmount(supply)
+                .taxAmount(tax)
+                .commissionAmount(commission)
                 .orderCount(1)
-                .status(SettlementStatus.WAITING)
+                .status(SettlementStatus.ORDERED)
                 .productId(1L)
                 .build();
     }

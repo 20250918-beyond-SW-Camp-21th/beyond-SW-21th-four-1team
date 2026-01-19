@@ -69,7 +69,7 @@ public class Settlement extends BaseEntity {
     private BigDecimal taxAmount;
 
     // 가맹점이 본사에 낼 최종 금액 (공급가 + 부가세)
-    @Column(nullable = false, precision = 15, scale = 2)
+    @Column(name = "total_settlement_amount", nullable = false, precision = 15, scale = 2)
     @NotNull
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal totalSettlementAmount;
@@ -92,6 +92,17 @@ public class Settlement extends BaseEntity {
     public void updatePdfUrl(String pdfUrl) {
         this.pdfUrl = pdfUrl;
     }
+
+    @Column(name = "commission_amount", nullable = false, precision = 15, scale = 2) // DB 컬럼명에 맞춤
+    @NotNull
+    @DecimalMin(value = "0.0", inclusive = false)
+    private BigDecimal commissionAmount;
+
+    // 해당 일자의 총 주문 금액 (supplyAmount + taxAmount와 같거나 관련됨)
+    @Column(name = "total_order_amount", nullable = false, precision = 15, scale = 2)
+    @NotNull
+    @DecimalMin(value = "0.0", inclusive = false)
+    private BigDecimal totalOrderAmount;
 
     // 상품 ID
     @Column(nullable = false)

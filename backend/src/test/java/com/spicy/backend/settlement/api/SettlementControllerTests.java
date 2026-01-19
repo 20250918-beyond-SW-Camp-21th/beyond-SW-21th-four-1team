@@ -20,7 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -87,7 +89,7 @@ class SettlementControllerTests {
             // given
             MonthlySettlementResponse response = MonthlySettlementResponse.builder()
                     .totalAmount(new BigDecimal("3000000"))
-                    .status(SettlementStatus.WAITING)
+                    .status(SettlementStatus.ORDERED)
                     .build();
 
             given(settlementService.getMonthlySettlement(any())).willReturn(response);
@@ -99,7 +101,7 @@ class SettlementControllerTests {
                             .param("yearMonth", "2026-01"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.totalAmount").value(3000000))
-                    .andExpect(jsonPath("$.status").value("WAITING"));
+                    .andExpect(jsonPath("$.status").value("ORDERED")); // ✅ 수정
         }
     }
 
@@ -113,7 +115,8 @@ class SettlementControllerTests {
             // given
             byte[] mockPdfContent = "%PDF-test-content".getBytes();
             given(settlementService.getMonthlySettlement(any())).willReturn(MonthlySettlementResponse.builder().build());
-            given(settlementFileService.createAndUploadSettlementPdf(any())).willReturn(mockPdfContent);
+            given(settlementFileService.createMonthlySettlementPdf(any(MonthlySettlementResponse.class), anyString()))
+                    .willReturn(mockPdfContent);
 
             // when & then
             mockMvc.perform(get("/api/v1/settlements/monthly/download")
@@ -122,7 +125,9 @@ class SettlementControllerTests {
                             .param("yearMonth", "2026-01"))
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_PDF))
-                    .andExpect(header().string("Content-Disposition", "attachment; filename=settlement_2026-01.pdf"))
+                    // ✅ 완전일치 대신 포함 검사 (인코딩/filename* 대응)
+                    .andExpect(header().string("Content-Disposition", containsString("attachment")))
+                    .andExpect(header().string("Content-Disposition", containsString("receipt_2026-01.pdf")))
                     .andExpect(content().bytes(mockPdfContent));
         }
     }
@@ -139,7 +144,7 @@ class SettlementControllerTests {
 
             // when & then
             mockMvc.perform(post("/api/v1/settlements/generate")
-                            .with(csrf()) // POST 요청 시 CSRF 방어 대응
+                            .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isOk());
