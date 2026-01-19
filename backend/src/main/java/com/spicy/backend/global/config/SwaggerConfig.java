@@ -113,5 +113,4 @@ public class SwaggerConfig {
                         .title("AccountBookForMoms API")
                         .version("v1"));
     }
-
 }
