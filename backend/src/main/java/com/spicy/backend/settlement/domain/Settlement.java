@@ -106,6 +106,5 @@ public class Settlement extends BaseEntity {
 
     // 상품 ID
     @Column(nullable = false)
-    @NotNull
     private Long productId;
 }
