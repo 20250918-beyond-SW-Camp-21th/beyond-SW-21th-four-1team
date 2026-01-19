@@ -12,3 +12,12 @@ spring:
   config:
     activate:
       on-profile: test
+
+jwt:
+  # Base64 for "this-is-a-dummy-secret-for-testing-purposes-only-12345678"
+  secret: dGhpcy1pcy1hLWR1bW15LXNlY3JldC1mb3ItdGVzdGluZy1wdXJwb3Nlcy1vbmx5LTEyMzQ1Njc4
+  expiration: 1800000
+  refresh-expiration: 1209600000
+
+spicy:
+  admin-key: "test-admin-key"
