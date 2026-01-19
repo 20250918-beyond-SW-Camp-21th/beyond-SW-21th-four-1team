@@ -31,15 +31,15 @@ class SettlementFileServiceIntegrationTests {
         // given: 실제 템플릿에 들어갈 데이터 준비
         MonthlySettlementResponse data = MonthlySettlementResponse.builder()
                 .totalAmount(new BigDecimal("2500000"))
-                .commissionAmount(new BigDecimal("125000"))
-                .settlementAmount(new BigDecimal("2375000"))
-                .status(SettlementStatus.WAITING)
+                .supplyAmount(new BigDecimal("2272727")) // 예시값 (원하면 정확히 계산해도 됨)
+                .taxAmount(new BigDecimal("227273"))
+                .status(SettlementStatus.ORDERED)
                 .payoutDate(LocalDate.of(2026, 2, 10))
                 .productId(101L)
                 .build();
 
         // when: 실제 서비스 로직 수행 (Thymeleaf 렌더링 + iText 변환)
-        byte[] pdfBytes = settlementFileService.createAndUploadSettlementPdf(data);
+        byte[] pdfBytes = settlementFileService.createMonthlySettlementPdf(data, "2026-01");
 
         // then: 생성된 PDF 검증
         assertThat(pdfBytes).isNotNull();
@@ -49,7 +49,6 @@ class SettlementFileServiceIntegrationTests {
 
         // PDF 파일의 시작 마커(%PDF-) 확인 (진짜 PDF 형식인지 검증)
         String pdfHeader = new String(pdfBytes, 0, 4, StandardCharsets.US_ASCII);
-
-        System.out.println("통합 테스트 성공 - 생성된 PDF 크기: " + pdfBytes.length + " bytes");
+        assertThat(pdfHeader).isEqualTo("%PDF");
     }
 }
