@@ -40,11 +40,11 @@ const handleLogin = async () => {
   <div class="tteokbokki-app">
     <div class="auth-container">
       <!-- Decorator -->
-      <div class="auth-decor">🫑️</div>
+      <div class="auth-decor">🌶️</div>
       <div class="premium-card auth-card">
         <header class="auth-header">
           <div class="brand">
-            <span class="brand-icon">🫑️</span>
+            <span class="brand-icon">🌶️</span>
             <h1 class="brand-name">SPICY</h1>
           </div>
           <p class="auth-subtitle">맛있는 서비스 이용을 위해 로그인해주세요</p>
