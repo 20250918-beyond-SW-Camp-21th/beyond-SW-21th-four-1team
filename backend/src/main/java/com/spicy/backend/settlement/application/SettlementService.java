@@ -111,7 +111,7 @@ public class SettlementService {
      */
     @Transactional
     public void createSettlement(Long storeId, LocalDate targetDate) {
-        if (settlementRepository.findByStoreIdAndSettlementDate(storeId, targetDate).isPresent()) {
+    if (settlementRepository.findByStoreIdAndSettlementDate(storeId, targetDate).isPresent()) {
             throw new BusinessException(SettlementErrorCode.SETTLEMENT_ALREADY_EXISTS);
         }
 

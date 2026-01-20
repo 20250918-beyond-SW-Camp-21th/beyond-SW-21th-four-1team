@@ -80,7 +80,7 @@ class SettlementControllerTests {
         void success() throws Exception {
             MonthlySettlementResponse response = MonthlySettlementResponse.builder()
                     .totalAmount(new BigDecimal("3000000"))
-                    .status(SettlementStatus.ORDERED)
+                    .status(SettlementStatus.PENDING)
                     .build();
 
             given(settlementService.getMonthlySettlement(any())).willReturn(response);

@@ -158,8 +158,7 @@ public class SettlementController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
-    }*/
-
+    }*
     /**
      * PDF 응답을 위한 공통 ResponseEntity 생성 메서드
      */
