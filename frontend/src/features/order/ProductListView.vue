@@ -19,13 +19,13 @@ const products = ref([
     leadTime: 2,
     safetyStock: 50,
     unit: 'EA',
-    url: 'https://images.unsplash.com/photo-1563636619-e9108b9355ce?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&q=80&w=400' // 교체됨 (우유병)
   },
   {
     productId: 2,
     productCode: 'PROD-002',
     productName: '무항생제 달걀 30구',
-    category: 'BEVERAGE',
+    category: 'FOOD', // 카테고리 수정 제안 (음료 아님)
     costPrice: 5000.00,
     price: 7500.00,
     description: '동물복지 인증을 받은 무항생제 달걀입니다.',
@@ -33,13 +33,13 @@ const products = ref([
     leadTime: 3,
     safetyStock: 20,
     unit: 'BOX',
-    url: 'https://images.unsplash.com/photo-1582722872445-41ef5aba16db?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&q=80&w=400' 
   },
   {
     productId: 3,
     productCode: 'PROD-003',
     productName: '청송 꿀사과 5kg',
-    category: 'BEVERAGE',
+    category: 'FRUIT', // 카테고리 수정 제안
     costPrice: 15000.00,
     price: 22000.00,
     description: '경북 청송에서 재배한 고당도 꿀사과입니다.',
@@ -47,13 +47,13 @@ const products = ref([
     leadTime: 5,
     safetyStock: 10,
     unit: 'BOX',
-    url: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?auto=format&fit=crop&q=80&w=400' // 기존 유지 (정상)
   },
   {
     productId: 4,
     productCode: 'PROD-004',
     productName: '한돈 삼겹살 100g',
-    category: 'BEVERAGE',
+    category: 'MEAT', // 카테고리 수정 제안
     costPrice: 2200.00,
     price: 3500.00,
     description: '국내산 한돈, 구이용 삼겹살입니다.',
@@ -61,13 +61,13 @@ const products = ref([
     leadTime: 2,
     safetyStock: 100,
     unit: 'G',
-    url: 'https://images.unsplash.com/photo-1602470520998-f4a5ec4b92be?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&q=80&w=400' // 교체됨 (육류)
   },
   {
     productId: 5,
     productCode: 'PROD-005',
     productName: '임금님표 이천쌀 20kg',
-    category: 'BEVERAGE',
+    category: 'GRAIN', // 카테고리 수정 제안
     costPrice: 38000.00,
     price: 52000.00,
     description: '2025년 가을에 수확한 햅쌀입니다.',
@@ -75,7 +75,7 @@ const products = ref([
     leadTime: 7,
     safetyStock: 5,
     unit: 'BAG',
-    url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=400' // 기존 유지 (정상)
   },
   {
     productId: 6,
@@ -89,13 +89,13 @@ const products = ref([
     leadTime: 3,
     safetyStock: 200,
     unit: 'EA',
-    url: 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?auto=format&fit=crop&q=80&w=400' // 기존 유지 (정상)
   },
   {
     productId: 7,
     productCode: 'PROD-007',
     productName: '국산 콩 두부 300g',
-    category: 'BEVERAGE',
+    category: 'FOOD',
     costPrice: 1200.00,
     price: 2000.00,
     description: '국산콩 100%로 만든 고소한 찌개용 두부입니다.',
@@ -103,13 +103,13 @@ const products = ref([
     leadTime: 2,
     safetyStock: 30,
     unit: 'EA',
-    url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400' // 기존 유지 (정상)
   },
   {
     productId: 8,
     productCode: 'PROD-008',
     productName: '신라면 멀티팩(5입)',
-    category: 'BEVERAGE',
+    category: 'FOOD',
     costPrice: 3500.00,
     price: 4800.00,
     description: '얼큰하고 진한 국물 맛이 일품인 라면입니다.',
@@ -117,13 +117,13 @@ const products = ref([
     leadTime: 4,
     safetyStock: 50,
     unit: 'PACK',
-    url: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?auto=format&fit=crop&q=80&w=400' // 기존 유지 (정상)
   },
   {
     productId: 9,
     productCode: 'PROD-009',
     productName: '종가집 포기김치 3kg',
-    category: 'BEVERAGE',
+    category: 'FOOD',
     costPrice: 18000.00,
     price: 29000.00,
     description: '전라도 전통 방식으로 담근 포기김치입니다.',
@@ -131,13 +131,13 @@ const products = ref([
     leadTime: 5,
     safetyStock: 10,
     unit: 'EA',
-    url: 'https://images.unsplash.com/photo-1583224964978-2257b960c3d3?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1583224964978-2257b960c3d3?auto=format&fit=crop&q=80&w=400' // 기존 유지 (정상)
   },
   {
     productId: 10,
     productCode: 'PROD-010',
     productName: '우유 식빵 400g',
-    category: 'BEVERAGE',
+    category: 'BAKERY', // 카테고리 수정 제안
     costPrice: 2500.00,
     price: 3800.00,
     description: '천연 버터를 사용하여 풍미가 좋은 식빵입니다.',
@@ -145,9 +145,10 @@ const products = ref([
     leadTime: 1,
     safetyStock: 15,
     unit: 'EA',
-    url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=400'
+    url: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=400' // 기존 유지 (정상)
   }
 ]);
+
 
 const quantities = ref({});
 products.value.forEach(p => {
