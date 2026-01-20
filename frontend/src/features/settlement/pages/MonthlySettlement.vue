@@ -172,12 +172,21 @@ onMounted(() => {
         @filter-change="handleFilterChange"
       />
 
+      <div class="action-bar">
+        <button 
+          class="btn-spicy create-btn" 
+          @click="handleCreateMonthlySettlement"
+          :disabled="isCreating || loading"
+        >
+          <span v-if="isCreating">⏳ 생성 중...</span>
+          <span v-else>➕ 정산 생성하기</span>
+        </button>
+      </div>
+
       <MonthlyTable 
         :data="filteredSettlementData" 
         :loading="loading"
-        :is-creating="isCreating"
         @download-pdf="handleDownloadPdf"
-        @create-settlement="handleCreateMonthlySettlement"
       />
     </main>
   </div>
@@ -229,6 +238,17 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
+}
+
+.action-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+}
+
+.create-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
 }
 
 .error-alert {

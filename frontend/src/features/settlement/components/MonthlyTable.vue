@@ -7,14 +7,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
-  },
-  isCreating: {
-    type: Boolean,
-    default: false
   }
 });
 
-const emit = defineEmits(['download-pdf', 'create-settlement']);
+const emit = defineEmits(['download-pdf']);
 
 const formatCurrency = (value) => {
   if (!value) return '₩0';
@@ -136,14 +132,6 @@ const handleDownload = () => {
     <div v-else class="empty-state premium-card">
       <span class="empty-icon">📭</span>
       <p>해당 월의 정산 데이터가 없습니다.</p>
-      <button 
-        class="btn-spicy create-btn" 
-        @click="$emit('create-settlement')"
-        :disabled="isCreating || loading"
-      >
-        <span v-if="isCreating">⏳ 생성 중...</span>
-        <span v-else>➕ 정산 생성하기</span>
-      </button>
     </div>
   </div>
 </template>

@@ -116,6 +116,17 @@ onMounted(() => {
         <span class="icon">🌶️</span> {{ error }}
       </div>
 
+      <!-- 정산 생성 진행 상황 표시 -->
+      <div v-if="isCreating" class="progress-alert premium-card">
+        <div class="progress-content">
+          <div class="progress-icon">⏳</div>
+          <div class="progress-info">
+            <h4>정산 생성 중...</h4>
+            <p>잠시만 기다려주세요...</p>
+          </div>
+        </div>
+      </div>
+
       <SettlementFilter 
         mode="daily" 
         @filter-change="handleFilterChange"
@@ -128,7 +139,7 @@ onMounted(() => {
           :disabled="isCreating || loading"
         >
           <span v-if="isCreating">⏳ 생성 중...</span>
-          <span v-else>➕ 정산 생성하기</span>
+          <span v-else">➕ 정산 생성하기</span>
         </button>
       </div>
 
@@ -209,6 +220,53 @@ onMounted(() => {
 .create-btn {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
+}
+
+.progress-alert {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #fef3c7, #fff7ed);
+  border: 2px solid var(--sauce-orange);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.9; }
+}
+
+.progress-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.progress-icon {
+  font-size: 3rem;
+  animation: rotate 2s infinite linear;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0); }
+  to { transform: rotate(360deg); }
+}
+
+.progress-info {
+  flex: 1;
+}
+
+.progress-info h4 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--deep-brown);
+  margin: 0 0 0.5rem 0;
+}
+
+.progress-info p {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 @media (max-width: 768px) {
