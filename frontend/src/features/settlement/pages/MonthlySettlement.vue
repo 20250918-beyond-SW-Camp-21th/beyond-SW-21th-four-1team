@@ -62,6 +62,46 @@ const handleDownloadPdf = async () => {
     loading.value = false;
   }
 };
+
+const handleCreateMonthlySettlement = async () => {
+  if (!confirm(`${currentFilters.value.yearMonth}월의 정산을 생성하시겠습니까?\n해당 월의 모든 배송 완료된 주문에 대해 일별 정산이 생성됩니다.`)) {
+    return;
+  }
+
+  try {
+    loading.value = true;
+    
+    // 해당 월의 모든 날짜에 대해 정산 생성 시도
+    const [year, month] = currentFilters.value.yearMonth.split('-');
+    const daysInMonth = new Date(year, month, 0).getDate();
+    
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = `${currentFilters.value.yearMonth}-${String(day).padStart(2, '0')}`;
+      try {
+        await settlementApi.createSettlement(currentFilters.value.storeId, currentFilters.value.productId, date);
+        successCount++;
+      } catch (err) {
+        // 이미 정산이 존재하거나 주문이 없는 경우는 무시
+        errorCount++;
+      }
+    }
+    
+    if (successCount > 0) {
+      alert(`🌶️ ${successCount}일의 정산이 성공적으로 생성되었습니다!`);
+      // Reload the data
+      await loadMonthlySettlement(currentFilters.value);
+    } else {
+      alert('⚠️ 생성할 수 있는 정산이 없습니다.\n해당 월에 배송 완료된 주문이 없거나 이미 정산이 생성되었습니다.');
+    }
+  } catch (err) {
+    alert(`정산 생성 중 오류가 발생했습니다: ${err.message}`);
+  } finally {
+    loading.value = false;
+  }
+};
 </script>
 
 <template>
@@ -88,6 +128,7 @@ const handleDownloadPdf = async () => {
         :data="filteredSettlementData" 
         :loading="loading"
         @download-pdf="handleDownloadPdf"
+        @create-settlement="handleCreateMonthlySettlement"
       />
     </main>
   </div>
