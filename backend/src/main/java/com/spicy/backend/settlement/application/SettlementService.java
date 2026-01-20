@@ -51,7 +51,7 @@ public class SettlementService {
         Settlement daily = settlementRepository.findByStoreIdAndSettlementDate(request.storeId(), request.date())
                 .orElseThrow(() -> new BusinessException(SettlementErrorCode.SETTLEMENT_NOT_FOUND));
 
-        // 2. [수정 포인트] 해당 일자의 PENDING 주문 아이템들을 다시 수집
+        // 2. 해당 일자의 PENDING 주문 아이템들을 다시 수집
         List<SettlementItemResponse> items =
                 getSettlementItemsInPeriod(request.storeId(), request.date(), request.date());
 
@@ -130,7 +130,7 @@ public class SettlementService {
         List<Long> orderIds = orders.stream().map(Order::getId).toList();
         List<OrderItem> allItems = orderItemRepository.findAllByOrderIdIn(orderIds);
 
-        // [요구사항] 단가 * 수량 직접 계산
+        // 단가 * 수량 직접 계산
         BigDecimal totalAmount = allItems.stream()
                 .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

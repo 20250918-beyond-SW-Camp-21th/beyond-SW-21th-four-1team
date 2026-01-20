@@ -134,7 +134,6 @@ public class SettlementController {
             @Valid @RequestBody DailySettlementRequest request
 
     ) { log.info("generatereq======> {}", request);
-        // [수정] 특정 productId가 아닌 가맹점 일괄 정산을 위해 storeId와 date만 전달
 
         settlementService.createSettlement(request.storeId(), request.date());
         String responseMessage = "정산 데이터 및 PDF 영수증 생성 완료";
