@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum SettlementStatus {
     // 본사로 발주를 넣은 직후 (결제 대기 상태)
-    ORDERED("ORDERED", "발주 완료"),
+    PENDING("ORDERED", "발주 완료"),
 
     // 가맹점주가 대금 지불을 완료했을 때
     PAID("PAID", "결제 완료"),

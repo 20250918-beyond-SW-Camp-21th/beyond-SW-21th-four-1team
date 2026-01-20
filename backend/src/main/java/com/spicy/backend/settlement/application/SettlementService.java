@@ -2,8 +2,10 @@ package com.spicy.backend.settlement.application;
 
 import com.spicy.backend.demandplan.error.DemandPlanErrorCode;
 import com.spicy.backend.global.error.exception.BusinessException;
+import com.spicy.backend.order.dao.order.OrderItemRepository;
 import com.spicy.backend.order.dao.order.OrderRepository;
 import com.spicy.backend.order.domain.Order;
+import com.spicy.backend.order.domain.OrderItem;
 import com.spicy.backend.order.dto.response.OrderResponse;
 import com.spicy.backend.settlement.dao.SettlementRepository;
 import com.spicy.backend.settlement.domain.Settlement;
@@ -11,6 +13,7 @@ import com.spicy.backend.settlement.dto.request.DailySettlementRequest;
 import com.spicy.backend.settlement.dto.request.MonthlySettlementRequest;
 import com.spicy.backend.settlement.dto.response.DailySettlementResponse;
 import com.spicy.backend.settlement.dto.response.MonthlySettlementResponse;
+import com.spicy.backend.settlement.dto.response.SettlementItemResponse;
 import com.spicy.backend.settlement.enums.SettlementStatus;
 import com.spicy.backend.settlement.error.SettlementErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +30,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -38,132 +40,184 @@ public class SettlementService {
 
     private final SettlementRepository settlementRepository;
     private final OrderRepository orderRepository;
-    private final SettlementFileService settlementFileService; // 로컬 파일 서비스 의존성 추가
+    private final OrderItemRepository orderItemRepository;
+    private final SettlementFileService settlementFileService;
 
     /**
-     * 일별 매입 내역 조회 (UI 대시보드 상단 위젯용)
+     * 일별 매입 내역 조회 (상세 품목 리스트 포함)
      */
     public DailySettlementResponse getDailySettlement(DailySettlementRequest request) {
+        // 1. DB에 저장된 정산 마스터 레코드 조회
         Settlement daily = settlementRepository.findByStoreIdAndSettlementDate(request.storeId(), request.date())
                 .orElseThrow(() -> new BusinessException(SettlementErrorCode.SETTLEMENT_NOT_FOUND));
 
-        LocalDate firstDay = request.date().withDayOfMonth(1);
-        List<Settlement> monthlyList = settlementRepository.findByStoreIdAndSettlementDateBetween(
-                request.storeId(), firstDay, request.date());
+        // 2. 해당 일자의 PENDING 주문 아이템들을 다시 수집
+        List<SettlementItemResponse> items =
+                getSettlementItemsInPeriod(request.storeId(), request.date(), request.date());
 
-        BigDecimal accumulatedAmount = monthlyList.stream()
-                .map(Settlement::getTotalSettlementAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal monthlyAccumulatedAmount =
+                calculateMonthlyAccumulatedAmount(request.storeId(), request.date());
 
         return DailySettlementResponse.builder()
+                .items(items)
                 .orderCount(daily.getOrderCount())
                 .dailyAmount(daily.getTotalSettlementAmount())
-                .monthlyAccumulatedAmount(accumulatedAmount)
-                .productId(daily.getProductId())
+                .monthlyAccumulatedAmount(monthlyAccumulatedAmount)
                 .build();
     }
 
     /**
-     * 월별 매입 정산 조회
+     * 월별 매입 정산 조회 (월간 전체 품목 상세 포함)
      */
     public MonthlySettlementResponse getMonthlySettlement(MonthlySettlementRequest request) {
-        YearMonth ym;
-        try {
-            ym = YearMonth.parse(request.yearMonth());
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("잘못된 년월 형식입니다: " + request.yearMonth(), e);
-        }
+        YearMonth ym = YearMonth.parse(request.yearMonth());
+        LocalDate start = ym.atDay(1);
+        LocalDate end = ym.atEndOfMonth();
 
-        List<Settlement> monthlyList = settlementRepository.findByStoreIdAndSettlementDateBetween(
-                request.storeId(), ym.atDay(1), ym.atEndOfMonth());
+        List<Settlement> monthlyList =
+                settlementRepository.findByStoreIdAndSettlementDateBetween(request.storeId(), start, end);
 
-        BigDecimal totalOrder = monthlyList.stream().map(Settlement::getTotalSettlementAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalSupply = monthlyList.stream().map(Settlement::getSupplyAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalTax = monthlyList.stream().map(Settlement::getTaxAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<SettlementItemResponse> items =
+                getSettlementItemsInPeriod(request.storeId(), start, end);
 
-        return monthlyList.stream()
+        BigDecimal totalAmount = monthlyList.stream()
+                .map(Settlement::getTotalSettlementAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalSupply = monthlyList.stream()
+                .map(Settlement::getSupplyAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalTax = monthlyList.stream()
+                .map(Settlement::getTaxAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Settlement lastSettlement = monthlyList.stream()
                 .max(Comparator.comparing(Settlement::getSettlementDate))
-                .map(s -> MonthlySettlementResponse.builder()
-                        .totalAmount(totalOrder)
-                        .supplyAmount(totalSupply)
-                        .taxAmount(totalTax)
-                        .status(s.getStatus())
-                        .payoutDate(s.getPayoutDate())
-                        .productId(s.getProductId())
-                        .build())
-                .orElse(MonthlySettlementResponse.builder()
-                        .totalAmount(BigDecimal.ZERO)
-                        .supplyAmount(BigDecimal.ZERO)
-                        .taxAmount(BigDecimal.ZERO)
-                        .status(null)
-                        .payoutDate(null)
-                        .productId(null)
-                        .build());
+                .orElse(null);
+
+        return MonthlySettlementResponse.builder()
+                .items(items)
+                .totalAmount(totalAmount)
+                .supplyAmount(totalSupply)
+                .taxAmount(totalTax)
+                .status(lastSettlement != null ? lastSettlement.getStatus() : null)
+                .payoutDate(lastSettlement != null ? lastSettlement.getPayoutDate() : null)
+                .build();
     }
 
     /**
-     * 정산 데이터 생성 및 영수증 PDF 로컬 저장 자동화
+     * 정산 생성 및 PDF 저장 자동화
      */
     @Transactional
-    public void createSettlement(Long storeId, Long productId, LocalDate targetDate) {
-        if (settlementRepository.findByStoreIdAndSettlementDate(storeId, targetDate).isPresent()) {
+    public void createSettlement(Long storeId, LocalDate targetDate) {
+    if (settlementRepository.findByStoreIdAndSettlementDate(storeId, targetDate).isPresent()) {
             throw new BusinessException(SettlementErrorCode.SETTLEMENT_ALREADY_EXISTS);
         }
 
+        // 1. PENDING 상태 주문 조회
         List<Order> orders = orderRepository.findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(
-                storeId, com.spicy.backend.order.enums.Status.DELIVERED,
-                targetDate.atStartOfDay(), targetDate.atTime(LocalTime.MAX));
+                storeId,
+                com.spicy.backend.order.enums.Status.PENDING, // PENDING으로 변경
+                targetDate.atStartOfDay(),
+                targetDate.atTime(LocalTime.MAX));
 
         if (orders.isEmpty()) {
             throw new BusinessException(SettlementErrorCode.NO_ORDERS_FOR_SETTLEMENT);
         }
 
-        BigDecimal totalAmount = orders.stream().map(Order::getTotalAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal divisor = new BigDecimal("1.1");
-        BigDecimal supplyAmount = totalAmount.divide(divisor, 0, RoundingMode.HALF_UP);
+        // 2. OrderItem 전체 수집 및 금액 합산
+        List<Long> orderIds = orders.stream().map(Order::getId).toList();
+        List<OrderItem> allItems = orderItemRepository.findAllByOrderIdIn(orderIds);
+
+        // 단가 * 수량 직접 계산
+        BigDecimal totalAmount = allItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal supplyAmount = totalAmount.divide(new BigDecimal("1.1"), 0, RoundingMode.HALF_UP);
         BigDecimal taxAmount = totalAmount.subtract(supplyAmount);
 
-        BigDecimal commissionAmount = totalAmount.multiply(new BigDecimal("0.05")).setScale(0, RoundingMode.HALF_UP);
+        // 3. PDF용 DTO 생성
+        List<SettlementItemResponse> itemResponses = allItems.stream()
+                .map(item -> SettlementItemResponse.builder()
+                        .productId(item.getProductId())
+                        .productName(item.getProductName())
+                        .quantity(item.getQuantity().intValue())
+                        .unitPrice(item.getUnitPrice())
+                        .totalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .build())
+                .toList();
 
-        // PDF 먼저 생성
-                DailySettlementResponse pdfData = DailySettlementResponse.builder()
-                              .productId(productId).orderCount(orders.size()).dailyAmount(totalAmount).build();
-                String savedLocalPath = settlementFileService.saveDailySettlementPdf(pdfData, targetDate);
+        DailySettlementResponse pdfData = DailySettlementResponse.builder()
+                .orderCount(orders.size())
+                .dailyAmount(totalAmount)
+                .items(itemResponses)
+                .build();
+
+        // 4. 저장
+        String savedLocalPath = settlementFileService.saveDailySettlementPdf(pdfData, targetDate);
 
         Settlement settlement = Settlement.builder()
                 .storeId(storeId)
                 .settlementDate(targetDate)
-                .totalSettlementAmount(totalAmount)
+                .orderCount(orders.size())
                 .supplyAmount(supplyAmount)
                 .taxAmount(taxAmount)
-                .orderCount(orders.size())
+                .totalSettlementAmount(totalAmount)
                 .totalOrderAmount(totalAmount)
-                .status(SettlementStatus.ORDERED)
-                .commissionAmount(commissionAmount)
-                .productId(productId)
+                .settlementAmount(totalAmount)
+                .commissionAmount(totalAmount.multiply(new BigDecimal("0.05")).setScale(0, RoundingMode.HALF_UP))
+                .status(SettlementStatus.PENDING) // 정산 상태도 PENDING
                 .pdfUrl(savedLocalPath)
+                .productId(0L)
                 .build();
 
-
         settlementRepository.save(settlement);
-
-        /*// PDF 생성 및 경로 업데이트 (맞물림 수정)
-        DailySettlementResponse pdfData = DailySettlementResponse.builder()
-                .productId(productId).orderCount(orders.size()).dailyAmount(totalAmount).build();
-
-        String savedLocalPath = settlementFileService.saveDailySettlementPdf(pdfData, targetDate);
-        settlement.updatePdfUrl(savedLocalPath);*/
     }
 
     /**
-     * [추가] 정산 내역 목록 조회 (컨트롤러와 맞물림)
+     * [공통 로직] 특정 기간 내의 모든 배송완료 주문 아이템 수집 및 DTO 변환 (N+1 방지 버전)
+     */
+    private List<SettlementItemResponse> getSettlementItemsInPeriod(Long storeId, LocalDate start, LocalDate end) {
+        List<Order> orders = orderRepository.findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(
+                storeId,
+                com.spicy.backend.order.enums.Status.PENDING, // PENDING으로 수정
+                start.atStartOfDay(),
+                end.atTime(LocalTime.MAX));
+
+        if (orders.isEmpty()) return List.of();
+
+        List<Long> orderIds = orders.stream().map(Order::getId).toList();
+        List<OrderItem> allItems = orderItemRepository.findAllByOrderIdIn(orderIds);
+
+        return allItems.stream()
+                .map(item -> SettlementItemResponse.builder()
+                        .productId(item.getProductId())
+                        .productName(item.getProductName())
+                        .quantity(item.getQuantity().intValue())
+                        .unitPrice(item.getUnitPrice())
+                        .totalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .build())
+                .toList();
+    }
+
+    /**
+     * [공통 로직] 월 누적 매입 금액 계산
+     */
+    private BigDecimal calculateMonthlyAccumulatedAmount(Long storeId, LocalDate date) {
+        LocalDate firstDay = date.withDayOfMonth(1);
+        return settlementRepository.findByStoreIdAndSettlementDateBetween(storeId, firstDay, date).stream()
+                .map(Settlement::getTotalSettlementAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * 정산 내역 요약 목록 조회
      */
     public List<DailySettlementResponse> getSettlementList(Long storeId) {
-        List<Settlement> settlements =
-                settlementRepository.findAllByStoreIdOrderBySettlementDateDesc(storeId);
-        return settlements.stream()
+        return settlementRepository.findAllByStoreIdOrderBySettlementDateDesc(storeId).stream()
                 .map(s -> DailySettlementResponse.builder()
-                        .productId(s.getProductId())
                         .orderCount(s.getOrderCount())
                         .dailyAmount(s.getTotalSettlementAmount())
                         .build())
@@ -171,30 +225,22 @@ public class SettlementService {
     }
 
     /**
-     * 상세 팝업용: 정산에 포함된 개별 주문 내역 조회
+     * 정산 포함 상세 주문 리스트 (팝업용)
      */
-    @Transactional(readOnly = true)
     public List<OrderResponse> getOrdersBySettlementDate(Long storeId, LocalDate date) {
         List<Order> orders = orderRepository.findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(
-                storeId,
-                com.spicy.backend.order.enums.Status.DELIVERED,
-                date.atStartOfDay(),
-                date.atTime(LocalTime.MAX)
-        );
+                storeId, com.spicy.backend.order.enums.Status.DELIVERED,
+                date.atStartOfDay(), date.atTime(LocalTime.MAX));
 
         return OrderResponse.from(orders);
     }
 
     /**
-     * 통계 그래프용: 기간별 매입 정산 데이터 리스트 조회
+     * 그래프용 통계 데이터
      */
-    @Transactional(readOnly = true)
     public List<DailySettlementResponse> getSettlementStats(Long storeId, LocalDate start, LocalDate end) {
-        List<Settlement> settlements = settlementRepository.findByStoreIdAndSettlementDateBetween(storeId, start, end);
-
-        return settlements.stream()
+        return settlementRepository.findByStoreIdAndSettlementDateBetween(storeId, start, end).stream()
                 .map(s -> DailySettlementResponse.builder()
-                        .productId(s.getProductId())
                         .orderCount(s.getOrderCount())
                         .dailyAmount(s.getTotalSettlementAmount())
                         .build())
@@ -202,39 +248,36 @@ public class SettlementService {
     }
 
     /**
-     * [신규] 로컬 PDF 파일을 Resource로 로드 (컨트롤러의 파일 스트리밍 지원)
+     * 로컬 저장된 PDF 파일 로드
      */
     public Resource getPdfFileAsResource(Long settlementId) {
         Settlement settlement = settlementRepository.findById(settlementId)
                 .orElseThrow(() -> new BusinessException(SettlementErrorCode.SETTLEMENT_NOT_FOUND));
 
-        String pdfUrl = settlement.getPdfUrl();
-        if (pdfUrl == null || pdfUrl.isEmpty()) {
-            throw new BusinessException(SettlementErrorCode.SETTLEMENT_NOT_FOUND); // 혹은 전용 에러코드 사용
-        }
-
         try {
             Path filePath = Paths.get(settlement.getPdfUrl()).toAbsolutePath().normalize();
             Resource resource = new UrlResource(filePath.toUri());
-
             if (resource.exists()) return resource;
-            else throw new BusinessException(SettlementErrorCode.SETTLEMENT_NOT_FOUND);
-
+            else throw new BusinessException(SettlementErrorCode.FILE_NOT_FOUND);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("파일 경로 형식이 올바르지 않습니다.", e);
+            throw new RuntimeException("올바르지 않은 파일 경로입니다.", e);
         }
     }
 
     /**
-     * 수요 예측용 발주 수량 집계
+     * 수요 예측용 집계 (현재 로직 유지)
      */
-    public Integer getOrderCountInTerm(Long productId, int term) {
-        if(productId == null) throw new BusinessException(DemandPlanErrorCode.FAILED_TO_FETCH_PRODUCTS);
-        if(term < 0) throw new BusinessException(DemandPlanErrorCode.NOT_VALID_TERM);
+    public Integer getOrderCountInTerm(Long storeId, int term) {
+        if (term < 0) {
+            throw new BusinessException(DemandPlanErrorCode.NOT_VALID_TERM);
+        }
 
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(term);
 
-        return settlementRepository.getTotalQuantity(productId, startDate, endDate);
+        return settlementRepository.getTotalQuantity(storeId, startDate, endDate);
     }
+
+
+
 }

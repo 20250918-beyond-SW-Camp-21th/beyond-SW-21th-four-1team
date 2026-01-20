@@ -74,6 +74,9 @@ public class Settlement extends BaseEntity {
     @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal totalSettlementAmount;
 
+    @Column(name = "settlement_amount", nullable = false)
+    private BigDecimal settlementAmount;
+
     // 본사 발주 대금 결제(예정)일
     @Column
     private LocalDate payoutDate;
@@ -105,7 +108,6 @@ public class Settlement extends BaseEntity {
     private BigDecimal totalOrderAmount;
 
     // 상품 ID
-    @Column(nullable = false)
-    @NotNull
+    @Column(nullable = true)
     private Long productId;
 }

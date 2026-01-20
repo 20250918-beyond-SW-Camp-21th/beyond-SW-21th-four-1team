@@ -6,12 +6,17 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @Schema(description = "월별 정산 응답")
 public record MonthlySettlementResponse(
-        @Schema(description = "상품 식별 번호", example = "1")
-        Long productId,
+
+        @Schema(description = "월간 정산 포함 품목 상세 내역")
+        List<SettlementItemResponse> items,
+
+        /*@Schema(description = "상품 식별 번호", example = "1")
+        Long productId,*/
 
         @Schema(description = "해당 월 총 매입 금액 (합계)", example = "5000000.00")
         BigDecimal totalAmount,

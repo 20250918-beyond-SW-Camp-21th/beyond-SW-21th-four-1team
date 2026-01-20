@@ -26,9 +26,7 @@ class SettlementFileServiceTests {
         @Test
         @DisplayName("성공: 유효한 데이터를 전달하면 PDF 바이트 배열이 생성되어야 한다")
         void success() {
-            // given
             MonthlySettlementResponse data = MonthlySettlementResponse.builder()
-                    .productId(1L)
                     .totalAmount(new BigDecimal("5000000"))
                     .supplyAmount(new BigDecimal("4545455"))
                     .taxAmount(new BigDecimal("454545"))
@@ -36,10 +34,8 @@ class SettlementFileServiceTests {
                     .payoutDate(LocalDate.of(2026, 2, 10))
                     .build();
 
-            // when
             byte[] pdfResult = settlementFileService.createMonthlySettlementPdf(data, "2026-01");
 
-            // then
             assertThat(pdfResult).isNotNull();
             assertThat(pdfResult.length).isGreaterThan(0);
 
@@ -50,10 +46,8 @@ class SettlementFileServiceTests {
         @Test
         @DisplayName("성공: 데이터가 null이어도 템플릿이 허용하면 PDF가 생성될 수 있다")
         void success_WhenDataIsNull() {
-            // when
             byte[] pdfResult = settlementFileService.createMonthlySettlementPdf(null, "2026-01");
 
-            // then
             assertThat(pdfResult).isNotNull();
             assertThat(pdfResult.length).isGreaterThan(0);
 

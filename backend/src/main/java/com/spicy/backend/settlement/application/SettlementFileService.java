@@ -30,7 +30,15 @@ public class SettlementFileService {
     /**
      * [컨트롤러용] 일별 PDF 바이트 생성 (즉시 다운로드용)
      */
+
     public byte[] createDailySettlementPdf(DailySettlementResponse data, LocalDate date) {
+
+        if (data == null || data.items() == null || data.items().isEmpty()) {
+            log.warn("정산 데이터가 비어있습니다. 날짜: {}", date);
+            // 필요시 예외 처리
+        }
+
+
         Context context = new Context();
         context.setVariable("type", "DAILY");
         context.setVariable("receipt", data);

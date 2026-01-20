@@ -1,149 +1,289 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>정산 명세서</title>
+    <meta charset="UTF-8"/>
+    <title>정산 영수증</title>
     <style>
-        body { font-family: sans-serif; padding: 40px; color: #333; line-height: 1.6; }
-        .container { width: 100%; max-width: 700px; margin: 0 auto; border: 1px solid #ddd; padding: 30px; }
-        h1 { text-align: center; color: #ff6b6b; border-bottom: 2px solid #eee; padding-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
-        th { background-color: #fcfcfc; font-weight: bold; width: 40%; }
-        .amount { text-align: right; font-family: monospace; }
-        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #999; }
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
         body {
-            font-family: NanumGothic, sans-serif;
-            padding: 40px;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
             color: #333;
             line-height: 1.6;
-            font-size: 12px;
+            margin: 0;
+            padding: 20px;
         }
 
         .container {
-            width: 100%;
-            border: 2px solid #333;
-            padding: 30px;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 22px;
-            letter-spacing: 4px;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .info-table td {
-            padding: 6px;
-            vertical-align: top;
-        }
-
-        .company-info {
-            border: 1px solid #333;
-            padding: 10px;
-            text-align: right;
-        }
-
-        .main-table th,
-        .main-table td {
-            border: 1px solid #333;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .amount {
-            text-align: right;
+            max-width: 700px;
+            margin: 0 auto;
+            border: 3px solid #e74c3c;
+            padding: 40px;
+            background: #fff;
         }
 
         .header {
-            background-color: #eee;
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            color: #e74c3c;
+            margin: 0 0 10px 0;
             font-weight: bold;
+        }
+
+        .header .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #666;
+            width: 40%;
+        }
+
+        .info-value {
+            width: 60%;
+            text-align: right;
+            color: #333;
+        }
+
+        .amount-section {
+            margin: 30px 0;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            font-size: 16px;
+        }
+
+        .amount-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .amount-value {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #333;
         }
 
         .total-row {
-            font-weight: bold;
-            background-color: #f5f5f5;
+            border-top: 2px solid #e74c3c;
+            margin-top: 15px;
+            padding-top: 15px;
         }
 
-        .grand-total {
-            background-color: #333;
-            color: #fff;
-            font-weight: bold;
+        .total-row .amount-label {
+            font-size: 18px;
+            color: #e74c3c;
         }
 
-        .stamp {
+        .total-row .amount-value {
+            font-size: 20px;
+            color: #e74c3c;
+        }
+
+        .status-badge {
             display: inline-block;
-            border: 2px solid #000;
-            padding: 8px;
-            font-size: 11px;
-            margin-left: 10px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .status-ordered {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #17a2b8;
         }
 
         .footer {
-            margin-top: 40px;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
             text-align: center;
-            font-size: 11px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .footer .company-info {
+            margin: 10px 0;
+        }
+
+        .footer .timestamp {
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        .spicy-logo {
+            font-size: 40px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
-
 <body>
 <div class="container">
-    <h1>📑 정산 명세서</h1>
-
-    <table th:if="${settlement != null}">
-        <tr>
-            <th>상품 ID</th>
-            <td th:text="${settlement.productId}">-</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <th>총 주문 금액</th>
-            <td class="amount"><span th:text="${settlement.totalAmount}">0</span> 원</td>
-        </tr>
-        <tr>
-            <th>플랫폼 수수료 (5%)</th>
-            <td class="amount" style="color: #e74c3c;">
-                - <span th:text="${settlement.commissionAmount}">0</span> 원
-            </td>
-        </tr>
-        <tr>
-            <th>최종 정산 금액</th>
-            <td class="amount" style="font-weight: bold; color: #2c3e50;">
-                <span th:text="${settlement.settlementAmount}">0</span> 원
-            </td>
-        </tr>
-        <tr>
-            <th>정산 상태</th>
-            <td th:text="${settlement.status}">WAITING</td>
-        </tr>
-        <tr>
-            <th>지급 예정일</th>
-            <td th:text="${settlement.payoutDate != null ? settlement.payoutDate : '미정'}">2026-01-01</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div th:unless="${settlement != null}" style="text-align: center; padding: 50px; color: red;">
-        <p>정산 데이터를 찾을 수 없습니다.</p>
+    <!-- Header -->
+    <div class="header">
+        <div class="spicy-logo">🌶️</div>
+        <h1>SPICY 정산 영수증</h1>
+        <div class="subtitle" th:if="${type == 'DAILY'}">
+            일별 정산 명세서
+        </div>
+        <div class="subtitle" th:if="${type == 'MONTHLY'}">
+            월별 정산 명세서
+        </div>
+        <div class="subtitle">
+            발행일: <span th:text="${targetDate}">2026-01-19</span>
+        </div>
     </div>
 
+    <!-- 일별 정산 내용 -->
+    <div th:if="${type == 'DAILY' and receipt != null}">
+        <div class="info-section">
+            <div class="info-row">
+                <div class="info-label">정산 날짜</div>
+                <div class="info-value" th:text="${targetDate}">2026-01-19</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">주문 건수</div>
+                <div class="info-value">
+                    <span th:text="${receipt.orderCount}">0</span> 건
+                </div>
+            </div>
+        </div>
+
+        <div class="amount-section">
+            <div class="amount-row">
+                <div class="amount-label">일일 매입 금액</div>
+                <div class="amount-value">
+                    ₩<span th:text="${#numbers.formatInteger(receipt.dailyAmount, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+            <div class="amount-row" th:if="${receipt.monthlyAccumulatedAmount != null}">
+                <div class="amount-label">월 누적 매입 금액</div>
+                <div class="amount-value">
+                    ₩<span th:text="${#numbers.formatInteger(receipt.monthlyAccumulatedAmount, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+            <div class="amount-row total-row">
+                <div class="amount-label">총 정산 금액</div>
+                <div class="amount-value">
+                    ₩<span th:text="${#numbers.formatInteger(receipt.dailyAmount, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 월별 정산 내용 -->
+    <div th:if="${type == 'MONTHLY' and receipt != null}">
+        <div class="info-section">
+            <div class="info-row">
+                <div class="info-label">정산 기간</div>
+                <div class="info-value" th:text="${targetDate}">2026-01</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">정산 상태</div>
+                <div class="info-value">
+                    <span th:if="${receipt.status == 'ORDERED'}" class="status-badge status-ordered">발주 완료</span>
+                    <span th:if="${receipt.status == 'PAID'}" class="status-badge status-paid">결제 완료</span>
+                    <span th:if="${receipt.status == 'COMPLETED'}" class="status-badge status-completed">영수증 발행 완료</span>
+                </div>
+            </div>
+            <div class="info-row" th:if="${receipt.payoutDate != null}">
+                <div class="info-label">지급 예정일</div>
+                <div class="info-value" th:text="${receipt.payoutDate}">2026-02-10</div>
+            </div>
+        </div>
+
+        <div class="amount-section">
+            <div class="amount-row">
+                <div class="amount-label">총 매입 금액</div>
+                <div class="amount-value">
+                    ₩<span th:text="${#numbers.formatInteger(receipt.totalAmount, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+            <div class="amount-row">
+                <div class="amount-label">공급가액</div>
+                <div class="amount-value">
+                    ₩<span th:text="${#numbers.formatInteger(receipt.supplyAmount, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+            <div class="amount-row">
+                <div class="amount-label">부가세 (10%)</div>
+                <div class="amount-value">
+                    ₩<span th:text="${#numbers.formatInteger(receipt.taxAmount, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+            <div class="amount-row total-row">
+                <div class="amount-label">최종 정산 금액</div>
+                <div class="amount-value">
+                    ₩<span th:text="${#numbers.formatInteger(receipt.totalAmount, 0, 'COMMA')}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 데이터 없음 -->
+    <div th:if="${receipt == null}" style="text-align: center; padding: 60px 20px; color: #999;">
+        <div style="font-size: 48px; margin-bottom: 20px;">📭</div>
+        <p style="font-size: 18px; font-weight: bold;">정산 데이터를 찾을 수 없습니다.</p>
+        <p style="font-size: 14px;">해당 기간의 정산 내역이 존재하지 않습니다.</p>
+    </div>
+
+    <!-- Footer -->
     <div class="footer">
-        <p>본 문서는 Spicy 시스템에서 자동으로 생성된 확인용 명세서입니다.</p>
-        <p>생성일시: <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+        <div class="company-info">
+            <strong>SPICY</strong> | 본사 매입 정산 시스템
+        </div>
+        <div class="company-info">
+            문의: support@spicy.com | Tel: 02-1234-5678
+        </div>
+        <div class="timestamp">
+            발행일시: <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd HH:mm:ss')}">2026-01-19 17:00:00</span>
+        </div>
+        <div style="margin-top: 15px; font-size: 11px;">
+            본 문서는 SPICY 시스템에서 자동으로 생성된 정산 영수증입니다.
+        </div>
     </div>
 </div>
-
 </body>
 </html>

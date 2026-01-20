@@ -12,13 +12,13 @@ public record DailySettlementRequest(
             @Schema(description = "가맹점 식별 번호", example = "1")
             Long storeId,
 
-            @NotNull
+            /*@NotNull
             @Schema(description = "상품 식별 번호",example = "1")
-            Long productId,
+            Long productId,*/
 
             @NotNull(message = "조회 날짜는 필수입니다.")
             @PastOrPresent(message = "미래 날짜의 정산은 생성하거나 조회할 수 없습니다.")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) // ✅ GET 요청 파라미터 바인딩 시 날짜 형식 보장
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             @Schema(description = "조회 날짜 (YYYY-MM-DD)", example = "2026-01-09")
             LocalDate date
     ) {}

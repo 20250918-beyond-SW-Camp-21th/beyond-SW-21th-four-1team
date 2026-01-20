@@ -15,17 +15,14 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long>, S
 
     List<Settlement> findByStoreIdAndSettlementDateBetween(Long storeId, LocalDate start, LocalDate end);
 
-    // 가맹점별 전체 정산 목록 조회 (안티그래비티 UI 리스트용)
     List<Settlement> findAllByStoreIdOrderBySettlementDateDesc(Long storeId);
 
-    // 일정 기간 동안 본사에 발주한 총 수량 집계 (정밀 연산 및 통계용)
+    // productId가 null일 경우 가맹점 전체 수량을 집계하도록 변경
     @Query("""
-            SELECT SUM(s.orderCount) 
-            FROM Settlement s 
-            WHERE s.productId = :productId 
-              AND s.settlementDate BETWEEN :startDate AND :endDate
+            SELECT COALESCE(SUM(s.orderCount), 0) FROM Settlement s\s
+                WHERE s.storeId = :storeId AND s.settlementDate BETWEEN :startDate AND :endDate
            """)
-    Integer getTotalQuantity(@Param("productId") Long productId,
+    Integer getTotalQuantity(@Param("storeId") Long storeId,
                              @Param("startDate") LocalDate startDate,
                              @Param("endDate") LocalDate endDate);
 }
