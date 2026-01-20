@@ -42,7 +42,6 @@ const handleLogin = async () => {
     <div class="auth-container">
       <!-- Decorator -->
       <div class="auth-decor">🌶️</div>
-
       <div class="premium-card auth-card">
         <header class="auth-header">
           <div class="brand">
