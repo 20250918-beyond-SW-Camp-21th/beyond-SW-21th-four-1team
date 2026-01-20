@@ -1,7 +1,87 @@
-# devops-1team
+# Spicy
 
-# Back-end
-## 공통 사항
+## 📑 목차
+1. 팀 소개
+
+2. 프로젝트 개요
+
+3. 공통 사항
+
+4. 개발 규칙
+
+5. 개발환경 및 협업 도구
+
+6. 요구사항정의서서
+
+7. 화면 흐름도
+
+8. 메뉴 구성도
+
+9. 빌드 및 배포 문서
+
+10. 젠킨스 스크립트
+
+11. CI/CD 테스트
+
+12. 회고
+
+---
+
+## 1. 팀소개 👥
+
+<table align="center">
+  <tr>
+    <td align="center" width="180">
+      <img src="https://github.com/user-attachments/assets/3c83a708-a9ca-4e9d-b4a3-f4f7ef795d60"
+           style="width:160px; height:160px; object-fit:cover;" /><br>
+      <strong>김채우</strong><br>
+      chaewookim
+    </td>
+    <td align="center" width="180">
+      <img src="https://github.com/user-attachments/assets/7f35eca8-50ec-4fdb-b91f-f87ebccc03a2"
+           style="width:160px; height:160px; object-fit:cover;" /><br>
+      <strong>김윤경</strong><br>
+      yk5096
+    </td>
+    <td align="center" width="180">
+      <img src="https://github.com/user-attachments/assets/97654fad-65b1-4617-8891-89bd01215ad0"
+           style="width:160px; height:160px; object-fit:cover;" /><br>
+      <strong>김성은</strong><br>
+      rlatjddms
+    </td>
+    <td align="center" width="180">
+      <img src="https://github.com/user-attachments/assets/c4c4a095-9d54-4709-bb6c-9a141c9451a2"
+           style="width:160px; height:160px; object-fit:cover;" /><br>
+      <strong>유찬연</strong><br>
+      Yoocy0
+    </td>
+    <td align="center" width="180">
+      <img src="https://github.com/user-attachments/assets/2cb1e4bf-c136-404e-a8b7-237f4cfb07ec"
+           style="width:160px; height:160px; object-fit:cover;" /><br>
+      <strong>조윤호</strong><br>
+      cho-yunho01
+    </td>
+  </tr>
+</table>
+
+
+
+
+---
+
+## 2. 프로젝트 개요 📢 
+SPICY는 프리미엄 떡볶이 가맹점을 위한 가맹점 관리 시스템으로, 가맹점이 매장 내 재고를 실시간으로 관리하고 부족한 식재료를 본사에 직접 주문할 수 있도록 설계된 서비스입니다. 본사는 각 가맹점의 재고 및 주문 현황을 통합적으로 관리함으로써 물류 운영 효율을 높이는 것을 목표로 합니다.
+
+가맹점주(Store)는 매장별 재고 현황을 실시간으로 확인하고, 필요한 식자재를 간편하게 발주하며, 주문 및 배송 상태를 조회할 수 있습니다. 본사 관리자(HQ)는 전체 가맹점의 운영 현황을 모니터링하고 회원을 관리하며, 전반적인 물류 흐름을 제어하는 역할을 담당합니다.
+
+SPICY의 핵심 기능으로는 품목별 재고 수량과 입·출고 내역을 관리하는 재고 관리 기능이 있으며, 이를 통해 적정 재고 대비 부족한 품목을 쉽게 파악할 수 있습니다. 또한 이미지 중심의 프리미엄 상품 리스트와 장바구니 기반 주문 프로세스를 제공하는 스마트 발주 시스템을 통해 가맹점주의 주문 편의성을 높였습니다. 주문 이후에는 가맹점별로 접수, 배송 중, 완료 단계의 주문 상태를 실시간으로 추적할 수 있습니다.
+
+사용자 관리는 JWT 기반 인증 방식을 적용하여 Access Token과 Refresh Token을 활용한 보안 구조로 구현되었으며, 가맹점주 프로필 관리 기능과 본사 전용 회원 검색 기능을 통해 체계적인 계정 관리를 지원합니다.
+
+---
+
+
+## 3. 공통 사항 📌
 - 단위 테스트 작성(service 메소드 별로) : Junit 사용
 - 다른 사람이 알아보기 쉽도록 주석처리해야 합니다.
     - javadoc 형식 https://jake-seo-dev.tistory.com/59
@@ -10,7 +90,7 @@
 
 <br>
 
-## 개발규칙
+## 4. 개발규칙 📐
 
 ### ⭐ Code Convention
 
@@ -241,3 +321,207 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 </div>
 </details>
+
+
+---
+
+## 5. 협업도구 🤝 
+
+### 🛠 개발 환경 및 기술 스택
+
+![Java](https://img.shields.io/badge/Java-007396?style=flat-square&logo=java&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![Vue.js](https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=vuedotjs&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=flat-square&logo=mariadb&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
+
+### 🚀 DevOps · CI/CD
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white)
+
+### 💻 IDE & Tools
+
+![IntelliJ IDEA](https://img.shields.io/badge/IntelliJIDEA-000000?style=flat-square&logo=intellijidea&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)
+
+### 🤝 협업 도구
+
+![Discord](https://img.shields.io/badge/Discord-5865F2?style=flat-square&logo=discord&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-000000?style=flat-square&logo=notion&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white)
+![Google Drive](https://img.shields.io/badge/GoogleDrive-4285F4?style=flat-square&logo=googledrive&logoColor=white)
+![Figma](https://img.shields.io/badge/Figma-F24E1E?style=flat-square&logo=figma&logoColor=white)
+
+
+---
+
+## 6. 요구사항 정의서📋
+
+<img width="1801" height="627" alt="Image" src="https://github.com/user-attachments/assets/e1d8131f-6453-4a9f-ae3e-ee8145e09749" />
+
+<img width="1801" height="360" alt="Image" src="https://github.com/user-attachments/assets/e31eab95-b623-49de-99f2-d1e3de7ba914" />
+
+
+
+---
+
+## 7. 화면 흐름도 🔀 
+
+#### 계정
+<img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/e0914e76-d69e-4002-b1e3-e4567cbee6da" />
+
+#### 입고 출고
+<img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/2a7ebe0b-d0e7-417c-b446-c8e881c0365b" />
+
+#### 주문
+<img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/9c2ef62d-3c1f-4a88-b7f6-3ff13c524db9" />
+
+#### 정보 수정
+<img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/493c432e-6c63-4cf8-b94a-4ec56a8d4544" />
+
+---
+
+## 8. 메뉴 구성도 🗂
+<img width="1359" height="697" alt="Image" src="https://github.com/user-attachments/assets/e33af3ea-bd7b-47a2-9fc3-ee6dda52746a" />
+
+---
+
+## 9. 빌드 및 배포 문서 🗺️
+
+
+---
+
+## 10. 젠킨스 스크립트 🧪
+
+<details>
+  <summary>코드</summary>
+
+  ```
+pipeline {
+    agent any
+
+    environment {
+        SOURCE_GITHUB_URL = 'https://github.com/rlatjddms/devops-1team.git'
+        MANIFEST_GITHUB_URL = 'https://github.com/rlatjddms/devops-1team-manifest.git'
+        GIT_USERNAME = 'rlatjddms'
+        GIT_EMAIL = 'kseo_o@naver.com'
+        DOCKER_IMAGE = 'tjddms/spicy-backend'
+        DOCKER_API_VERSION = '1.44'
+    }
+
+    tools {
+        dockerTool 'docker' 
+    }
+
+    stages {
+        stage('Source Build') {
+            steps {
+                git branch: 'dev', url: "${env.SOURCE_GITHUB_URL}"
+                script {
+                    dir('backend') {
+                        if (isUnix()) {
+                            sh "chmod +x ./gradlew"
+                            sh "./gradlew clean build -Dspring.profiles.active=test"
+                        } else {
+                            bat "gradlew.bat clean build -Dspring.profiles.active=test"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build and Push') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        dir('backend') {
+                            if (isUnix()) {
+                                sh "docker build -t ${env.DOCKER_IMAGE}:${currentBuild.number} ."
+                                sh "docker build -t ${env.DOCKER_IMAGE}:latest ."
+                                sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
+                                sh "docker push ${env.DOCKER_IMAGE}:${currentBuild.number}"
+                                sh "docker push ${env.DOCKER_IMAGE}:latest"
+                                sh "docker logout"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('K8S Manifest Update') {
+            steps {
+                dir('manifest-repo') {
+                    deleteDir()
+                    git credentialsId: 'github', url: "${env.MANIFEST_GITHUB_URL}", branch: 'dev'
+                    
+                    script { 
+                        withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+                            if (isUnix()) {
+                                sh """
+                                    YML_FILES=\$(find . -type f \\( -name "*.yml" -o -name "*.yaml" \\))
+                                    for f in \$YML_FILES; do
+                                        if grep -q "${env.DOCKER_IMAGE}" "\$f"; then
+                                            echo "Updating image version in: \$f"
+                                            sed -i "s|${env.DOCKER_IMAGE}:.*|${env.DOCKER_IMAGE}:${currentBuild.number}|g" "\$f"
+                                        fi
+                                    done
+                                    
+                                    git config user.name "${env.GIT_USERNAME}"
+                                    git config user.email "${env.GIT_EMAIL}"
+                                    git add .
+                                    git commit -m "[UPDATE] image version ${currentBuild.number}" || echo "No changes"
+                                    git push https://\${GH_USER}:\${GH_TOKEN}@github.com/rlatjddms/devops-1team-manifest.git dev
+                                """
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '모든 빌드와 배포 성공!'
+        }
+        failure {
+            echo '빌드 실패! 로그를 확인하여 문제를 해결해 주세요.'
+        }
+        always {
+            echo '파이프라인 종료.'
+        }
+    }
+}
+```
+    
+</details>
+
+---
+
+## 11. CI/CD 테스트 🔁
+
+#### 젠킨스
+
+<img width="949" height="527" alt="Image" src="https://github.com/user-attachments/assets/e4e4ad6f-d767-4819-808f-daa2eb281e54" />
+
+#### ArgoCD
+
+<img width="1365" height="905" alt="Image" src="https://github.com/user-attachments/assets/9fabaee2-9c1e-457b-bab1-74a30734aefa" />
+
+
+## 12. 회고 ✍️
+
+| 이름 | 회고 |
+| --- | --- |
+| 김채우 |  |
+| 김윤경 |  |
+| 김성은 |  |
+| 유찬연 |  |
+| 조윤호 |  |
+
+
