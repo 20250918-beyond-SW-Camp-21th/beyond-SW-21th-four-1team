@@ -69,7 +69,7 @@
 
 ---
 
-## 2. 프로젝트 개요 📌
+## 2. 프로젝트 개요 📢 
 SPICY는 프리미엄 떡볶이 가맹점을 위한 가맹점 관리 시스템으로, 가맹점이 매장 내 재고를 실시간으로 관리하고 부족한 식재료를 본사에 직접 주문할 수 있도록 설계된 서비스입니다. 본사는 각 가맹점의 재고 및 주문 현황을 통합적으로 관리함으로써 물류 운영 효율을 높이는 것을 목표로 합니다.
 
 가맹점주(Store)는 매장별 재고 현황을 실시간으로 확인하고, 필요한 식자재를 간편하게 발주하며, 주문 및 배송 상태를 조회할 수 있습니다. 본사 관리자(HQ)는 전체 가맹점의 운영 현황을 모니터링하고 회원을 관리하며, 전반적인 물류 흐름을 제어하는 역할을 담당합니다.
@@ -81,7 +81,7 @@ SPICY의 핵심 기능으로는 품목별 재고 수량과 입·출고 내역을
 ---
 
 
-## 3. 공통 사항
+## 3. 공통 사항 📌
 - 단위 테스트 작성(service 메소드 별로) : Junit 사용
 - 다른 사람이 알아보기 쉽도록 주석처리해야 합니다.
     - javadoc 형식 https://jake-seo-dev.tistory.com/59
@@ -90,7 +90,7 @@ SPICY의 핵심 기능으로는 품목별 재고 수량과 입·출고 내역을
 
 <br>
 
-## 4. 개발규칙
+## 4. 개발규칙 📐
 
 ### ⭐ Code Convention
 
@@ -325,7 +325,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 5. 협업도구
+## 5. 협업도구 🤝 
 
 ### 🛠 개발 환경 및 기술 스택
 
@@ -359,7 +359,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 6. 요구사항 정의서
+## 6. 요구사항 정의서📋
 
 <img width="1801" height="627" alt="Image" src="https://github.com/user-attachments/assets/e1d8131f-6453-4a9f-ae3e-ee8145e09749" />
 
@@ -369,7 +369,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 7. 화면 흐름도
+## 7. 화면 흐름도 🔀 
 
 #### 계정
 <img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/e0914e76-d69e-4002-b1e3-e4567cbee6da" />
@@ -385,7 +385,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 8. 메뉴 구성도
+## 8. 메뉴 구성도 🗂
 <img width="1359" height="697" alt="Image" src="https://github.com/user-attachments/assets/e33af3ea-bd7b-47a2-9fc3-ee6dda52746a" />
 
 ---
@@ -503,7 +503,7 @@ pipeline {
 
 ---
 
-## 11. CI/CD 테스트
+## 11. CI/CD 테스트 🔁
 
 #### 젠킨스
 
