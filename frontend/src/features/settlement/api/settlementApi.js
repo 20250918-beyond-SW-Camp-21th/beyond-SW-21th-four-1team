@@ -1,6 +1,6 @@
 import api from '@/api/axios';
 
-const API_BASE_URL = '/settlements';
+const API_BASE_URL = 'http://localhost:8000/api/v1/settlements';
 
 export const settlementApi = {
     // 일별 정산 조회
