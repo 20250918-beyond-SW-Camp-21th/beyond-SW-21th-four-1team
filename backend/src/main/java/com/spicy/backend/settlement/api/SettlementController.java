@@ -12,14 +12,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +65,7 @@ public class SettlementController {
         byte[] pdfFile = settlementFileService.createDailySettlementPdf(responseData, request.date());
 
         // 3. 응답 처리
+        log.info("DailydownloadSettlement=======> {}", request);
         return createPdfResponse(pdfFile, "daily_receipt_" + request.date() + ".pdf");
     }
 
@@ -77,7 +76,9 @@ public class SettlementController {
     @GetMapping("/monthly")
     public ResponseEntity<MonthlySettlementResponse> getMonthlySettlement(
             @Valid MonthlySettlementRequest request) {
+        log.info("MonthlyreqSettlement=======> {}", request);
         MonthlySettlementResponse response = settlementService.getMonthlySettlement(request);
+        log.info("MonthlyresSettlement=======> {}", response);
         return ResponseEntity.ok(response);
     }
 
@@ -131,9 +132,15 @@ public class SettlementController {
     @PostMapping("/generate")
     public ResponseEntity<String> createSettlement(
             @Valid @RequestBody DailySettlementRequest request
-    ) {
+
+    ) { log.info("generatereq======> {}", request);
         // [수정] 특정 productId가 아닌 가맹점 일괄 정산을 위해 storeId와 date만 전달
+
         settlementService.createSettlement(request.storeId(), request.date());
+        String responseMessage = "정산 데이터 및 PDF 영수증 생성 완료";
+
+        log.info("generateres======> {}", responseMessage);
+
         return ResponseEntity.ok("정산 데이터 및 PDF 영수증 생성 완료");
     }
 
@@ -143,7 +150,7 @@ public class SettlementController {
         return ResponseEntity.ok(settlementService.getSettlementList(storeId));
     }
 
-    @Operation(summary = "영수증 다운로드", description = "정산 ID를 통해 저장된 PDF 영수증을 다운로드합니다.")
+    /*@Operation(summary = "영수증 다운로드", description = "정산 ID를 통해 저장된 PDF 영수증을 다운로드합니다.")
     @GetMapping("/{settlementId}/download")
     public ResponseEntity<Resource> downloadStoredPdf(@PathVariable Long settlementId) {
         Resource resource = settlementService.getPdfFileAsResource(settlementId);
@@ -152,7 +159,7 @@ public class SettlementController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
-    }
+    }*/
 
     /**
      * PDF 응답을 위한 공통 ResponseEntity 생성 메서드

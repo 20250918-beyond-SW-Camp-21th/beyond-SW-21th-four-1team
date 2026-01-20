@@ -47,9 +47,11 @@ public class SettlementService {
      * 일별 매입 내역 조회 (상세 품목 리스트 포함)
      */
     public DailySettlementResponse getDailySettlement(DailySettlementRequest request) {
+        // 1. DB에 저장된 정산 마스터 레코드 조회
         Settlement daily = settlementRepository.findByStoreIdAndSettlementDate(request.storeId(), request.date())
                 .orElseThrow(() -> new BusinessException(SettlementErrorCode.SETTLEMENT_NOT_FOUND));
 
+        // 2. [수정 포인트] 해당 일자의 PENDING 주문 아이템들을 다시 수집
         List<SettlementItemResponse> items =
                 getSettlementItemsInPeriod(request.storeId(), request.date(), request.date());
 
@@ -113,29 +115,47 @@ public class SettlementService {
             throw new BusinessException(SettlementErrorCode.SETTLEMENT_ALREADY_EXISTS);
         }
 
+        // 1. PENDING 상태 주문 조회
         List<Order> orders = orderRepository.findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(
-                storeId, com.spicy.backend.order.enums.Status.DELIVERED,
-                targetDate.atStartOfDay(), targetDate.atTime(LocalTime.MAX));
+                storeId,
+                com.spicy.backend.order.enums.Status.PENDING, // PENDING으로 변경
+                targetDate.atStartOfDay(),
+                targetDate.atTime(LocalTime.MAX));
 
         if (orders.isEmpty()) {
             throw new BusinessException(SettlementErrorCode.NO_ORDERS_FOR_SETTLEMENT);
         }
 
-        BigDecimal totalAmount = orders.stream()
-                .map(Order::getTotalAmount)
+        // 2. OrderItem 전체 수집 및 금액 합산
+        List<Long> orderIds = orders.stream().map(Order::getId).toList();
+        List<OrderItem> allItems = orderItemRepository.findAllByOrderIdIn(orderIds);
+
+        // [요구사항] 단가 * 수량 직접 계산
+        BigDecimal totalAmount = allItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal supplyAmount = totalAmount.divide(new BigDecimal("1.1"), 0, RoundingMode.HALF_UP);
         BigDecimal taxAmount = totalAmount.subtract(supplyAmount);
 
-        List<SettlementItemResponse> items = getSettlementItemsInPeriod(storeId, targetDate, targetDate);
+        // 3. PDF용 DTO 생성
+        List<SettlementItemResponse> itemResponses = allItems.stream()
+                .map(item -> SettlementItemResponse.builder()
+                        .productId(item.getProductId())
+                        .productName(item.getProductName())
+                        .quantity(item.getQuantity().intValue())
+                        .unitPrice(item.getUnitPrice())
+                        .totalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .build())
+                .toList();
 
         DailySettlementResponse pdfData = DailySettlementResponse.builder()
                 .orderCount(orders.size())
                 .dailyAmount(totalAmount)
-                .items(items)
+                .items(itemResponses)
                 .build();
 
+        // 4. 저장
         String savedLocalPath = settlementFileService.saveDailySettlementPdf(pdfData, targetDate);
 
         Settlement settlement = Settlement.builder()
@@ -148,9 +168,9 @@ public class SettlementService {
                 .totalOrderAmount(totalAmount)
                 .settlementAmount(totalAmount)
                 .commissionAmount(totalAmount.multiply(new BigDecimal("0.05")).setScale(0, RoundingMode.HALF_UP))
-                .status(SettlementStatus.ORDERED)
+                .status(SettlementStatus.PENDING) // 정산 상태도 PENDING
                 .pdfUrl(savedLocalPath)
-                .productId(0L) // ✅ 전체 정산이면 null 권장
+                .productId(0L)
                 .build();
 
         settlementRepository.save(settlement);
@@ -161,13 +181,14 @@ public class SettlementService {
      */
     private List<SettlementItemResponse> getSettlementItemsInPeriod(Long storeId, LocalDate start, LocalDate end) {
         List<Order> orders = orderRepository.findAllByStoreIdAndStatusAndCreatedAtBetweenAndDeletedAtIsNull(
-                storeId, com.spicy.backend.order.enums.Status.DELIVERED,
-                start.atStartOfDay(), end.atTime(LocalTime.MAX));
+                storeId,
+                com.spicy.backend.order.enums.Status.PENDING, // PENDING으로 수정
+                start.atStartOfDay(),
+                end.atTime(LocalTime.MAX));
 
         if (orders.isEmpty()) return List.of();
 
         List<Long> orderIds = orders.stream().map(Order::getId).toList();
-
         List<OrderItem> allItems = orderItemRepository.findAllByOrderIdIn(orderIds);
 
         return allItems.stream()
@@ -176,7 +197,7 @@ public class SettlementService {
                         .productName(item.getProductName())
                         .quantity(item.getQuantity().intValue())
                         .unitPrice(item.getUnitPrice())
-                        .totalPrice(item.getTotalPrice())
+                        .totalPrice(item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                         .build())
                 .toList();
     }
