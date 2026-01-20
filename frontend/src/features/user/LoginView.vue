@@ -37,7 +37,6 @@ const handleLogin = async () => {
 </script>
 
 <template>
-
   <div class="tteokbokki-app">
     <div class="auth-container">
       <!-- Decorator -->
