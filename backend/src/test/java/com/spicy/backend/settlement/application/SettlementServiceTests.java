@@ -42,13 +42,14 @@ class SettlementServiceTests {
     private SettlementFileService settlementFileService;
 
     @Test
-    @DisplayName("일별 정산 조회 - 성공")
+    @DisplayName("일별 정산 조회 - 성공") //order에서 값을 잘 받아왔는지
     void getDailySettlement_Success() {
         // Given
         Long storeId = 1L;
         LocalDate date = LocalDate.of(2026, 1, 21);
         DailySettlementRequest request = new DailySettlementRequest(storeId, date);
 
+        // 주문 건수(5)와 금액(100,000)이 DTO에 잘 매핑되었는지 확인
         Settlement mockSettlement = Settlement.builder()
                 .orderCount(5)
                 .totalSettlementAmount(new BigDecimal("100000"))
