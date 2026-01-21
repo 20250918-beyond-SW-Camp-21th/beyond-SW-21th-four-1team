@@ -361,11 +361,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ## 6. 요구사항 정의서📋
 
-<img width="1801" height="627" alt="Image" src="https://github.com/user-attachments/assets/e1d8131f-6453-4a9f-ae3e-ee8145e09749" />
-
-<img width="1801" height="360" alt="Image" src="https://github.com/user-attachments/assets/e31eab95-b623-49de-99f2-d1e3de7ba914" />
-
-
+<img width="1343" height="703" alt="Image" src="https://github.com/user-attachments/assets/bb30e293-1514-4807-91b7-37ce595e6ed9" />
 
 ---
 
@@ -386,12 +382,13 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 ---
 
 ## 8. 메뉴 구성도 🗂
-<img width="1359" height="697" alt="Image" src="https://github.com/user-attachments/assets/e33af3ea-bd7b-47a2-9fc3-ee6dda52746a" />
+
+<img width="1668" height="701" alt="Image" src="https://github.com/user-attachments/assets/3d5d280f-c06d-4208-9623-7c0b38d0e4f9" />
 
 ---
 
 ## 9. 빌드 및 배포 문서 🗺️
-
+<img width="981" height="677" alt="Image" src="https://github.com/user-attachments/assets/669d27a2-dfc9-4636-ba72-e6d81444f01f" />
 
 ---
 
