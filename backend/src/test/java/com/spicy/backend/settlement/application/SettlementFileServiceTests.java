@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,13 +40,14 @@ class SettlementFileServiceTests {
                 .dailyAmount(new BigDecimal("1000"))
                 .items(List.of())
                 .build();
-        LocalDate date = LocalDate.now();
+        LocalDate date = LocalDate.of(2026, 1, 21);
+
 
         // 템플릿 엔진 동작 Mocking
         given(templateEngine.process(anyString(), any(Context.class)))
                 .willReturn("<html><body>Test Receipt</body></html>");
 
-        // When
+        // Whenimport static org.assertj.core.api.Assertions.assertThat;
         byte[] pdfBytes = settlementFileService.createDailySettlementPdf(data, date);
 
         // Then
@@ -65,9 +66,15 @@ class SettlementFileServiceTests {
                 .willThrow(new RuntimeException("Template error"));
 
         // When 예외가 발생하는 행위를 정의 (실행 직전)
-        org.assertj.core.api.ThrowableAssert.ThrowingCallable execution =
-                () -> settlementFileService.createDailySettlementPdf(null, LocalDate.now());
+        DailySettlementResponse data = DailySettlementResponse.builder()
+                .orderCount(1)
+                .dailyAmount(new BigDecimal("1000"))
+                .items(List.of())
+                .build();
+        LocalDate date = LocalDate.of(2026, 1, 21);
 
+        org.assertj.core.api.ThrowableAssert.ThrowingCallable execution =
+                () -> settlementFileService.createDailySettlementPdf(data, date);
         // Then
         assertThatThrownBy(execution)
                 .isInstanceOf(RuntimeException.class)
