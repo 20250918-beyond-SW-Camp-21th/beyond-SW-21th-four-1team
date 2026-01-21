@@ -2,17 +2,28 @@
 
 ## 📑 목차
 1. [팀소개](#1-팀소개-)
+
 2. [프로젝트 개요](#2-프로젝트-개요-)
+
 3. [Code Convention](#3-code-convention-)
+
 4. [협업도구](#4-협업도구-)
+
 5. [요구사항 정의서](#5-요구사항-정의서)
+
 6. [화면 흐름도](#6-화면-흐름도-)
+
 7. [메뉴 구성도](#7-메뉴-구성도-)
-8. [시스템 아키텍처](#8-시스템-아키텍처-)
+
+8. [시스템 아키텍처](#8-시스템-아키텍처)
+
 9. [ERD](#9-erd)
+
 10. [젠킨스 스크립트](#10-젠킨스-스크립트-)
+
 11. [CI/CD 테스트](#11-cicd-테스트-)
-12. [회고](#12-회고-)
+
+12. [회고](#12-회고)
 
 
 
@@ -381,7 +392,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 8. 시스템 아키텍처 🗺️
+## 8. 시스템 아키텍처
 <img width="981" height="677" alt="Image" src="https://github.com/user-attachments/assets/669d27a2-dfc9-4636-ba72-e6d81444f01f" />
 
 ---
@@ -510,7 +521,7 @@ pipeline {
 <img width="1365" height="905" alt="Image" src="https://github.com/user-attachments/assets/9fabaee2-9c1e-457b-bab1-74a30734aefa" />
 
 
-## 12. 회고 ✍️
+## 12. 회고
 
 | 이름 | 회고 |
 | --- | --- |
