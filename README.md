@@ -381,13 +381,16 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 <img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/e0914e76-d69e-4002-b1e3-e4567cbee6da" />
 
 #### 입고 출고
-<img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/2a7ebe0b-d0e7-417c-b446-c8e881c0365b" />
+<img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/1949d2e1-b542-47fd-81e4-f624814850f5" />
 
 #### 주문
 <img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/9c2ef62d-3c1f-4a88-b7f6-3ff13c524db9" />
 
 #### 정보 수정
 <img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/493c432e-6c63-4cf8-b94a-4ec56a8d4544" />
+
+#### 정산 관리
+<img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/3a50ec4b-84fe-4aae-88b5-564024356ad9" />
 
 ---
 
