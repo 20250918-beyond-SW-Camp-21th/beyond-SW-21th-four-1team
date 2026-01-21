@@ -1,29 +1,20 @@
 # Spicy
 
 ## 📑 목차
-1. 팀 소개
+1. [팀소개](#1-팀소개-)
+2. [프로젝트 개요](#2-프로젝트-개요-)
+3. [Code Convention](#3-code-convention-)
+4. [협업도구](#4-협업도구-)
+5. [요구사항 정의서](#5-요구사항-정의서)
+6. [화면 흐름도](#6-화면-흐름도-)
+7. [메뉴 구성도](#7-메뉴-구성도-)
+8. [시스템 아키텍처](#8-시스템-아키텍처)
+9. [ERD](#9-erd)
+10. [젠킨스 스크립트](#10-젠킨스-스크립트-)
+11. [CI/CD 테스트](#11-cicd-테스트-)
+12. [회고](#12-회고)
 
-2. 프로젝트 개요
 
-3. 공통 사항
-
-4. 개발 규칙
-
-5. 개발환경 및 협업 도구
-
-6. 요구사항정의서서
-
-7. 화면 흐름도
-
-8. 메뉴 구성도
-
-9. 빌드 및 배포 문서
-
-10. 젠킨스 스크립트
-
-11. CI/CD 테스트
-
-12. 회고
 
 ---
 
@@ -80,8 +71,9 @@ SPICY의 핵심 기능으로는 품목별 재고 수량과 입·출고 내역을
 
 ---
 
+## 3. Code Convention 📌
 
-## 3. 공통 사항 📌
+### 공통 사항
 - 단위 테스트 작성(service 메소드 별로) : Junit 사용
 - 다른 사람이 알아보기 쉽도록 주석처리해야 합니다.
     - javadoc 형식 https://jake-seo-dev.tistory.com/59
@@ -90,7 +82,7 @@ SPICY의 핵심 기능으로는 품목별 재고 수량과 입·출고 내역을
 
 <br>
 
-## 4. 개발규칙 📐
+### 개발규칙 
 
 ### ⭐ Code Convention
 
@@ -325,7 +317,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 5. 협업도구 🤝 
+## 4. 협업도구 🤝 
 
 ### 🛠 개발 환경 및 기술 스택
 
@@ -333,6 +325,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 ![Vue.js](https://img.shields.io/badge/Vue.js-4FC08D?style=flat-square&logo=vuedotjs&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-6DB33F?style=flat-square&logo=springboot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/SpringSecurity-6DB33F?style=flat-square&logo=springsecurity&logoColor=white)
 ![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=flat-square&logo=mariadb&logoColor=white)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
@@ -340,6 +333,7 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 ### 🚀 DevOps · CI/CD
 
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
 ![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white)
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white)
 
@@ -359,17 +353,13 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 6. 요구사항 정의서📋
+## 5. 요구사항 정의서📋
 
-<img width="1801" height="627" alt="Image" src="https://github.com/user-attachments/assets/e1d8131f-6453-4a9f-ae3e-ee8145e09749" />
-
-<img width="1801" height="360" alt="Image" src="https://github.com/user-attachments/assets/e31eab95-b623-49de-99f2-d1e3de7ba914" />
-
-
+<img width="1343" height="703" alt="Image" src="https://github.com/user-attachments/assets/bb30e293-1514-4807-91b7-37ce595e6ed9" />
 
 ---
 
-## 7. 화면 흐름도 🔀 
+## 6. 화면 흐름도 🔀 
 
 #### 계정
 <img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/e0914e76-d69e-4002-b1e3-e4567cbee6da" />
@@ -385,13 +375,19 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 8. 메뉴 구성도 🗂
-<img width="1359" height="697" alt="Image" src="https://github.com/user-attachments/assets/e33af3ea-bd7b-47a2-9fc3-ee6dda52746a" />
+## 7. 메뉴 구성도 🗂
+
+<img width="1668" height="701" alt="Image" src="https://github.com/user-attachments/assets/3d5d280f-c06d-4208-9623-7c0b38d0e4f9" />
 
 ---
 
-## 9. 빌드 및 배포 문서 🗺️
+## 8. 시스템 아키텍처 🗺️
+<img width="981" height="677" alt="Image" src="https://github.com/user-attachments/assets/669d27a2-dfc9-4636-ba72-e6d81444f01f" />
 
+---
+
+## 9. ERD
+<img width="2038" height="4280" alt="Image" src="https://github.com/user-attachments/assets/1a3b95ef-d037-457c-b7c3-9d9afdbeb59a" />
 
 ---
 

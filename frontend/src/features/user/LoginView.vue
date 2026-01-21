@@ -1,7 +1,7 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { login } from '@/api/auth.js';
+import {ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {login} from '@/api/auth.js';
 
 const router = useRouter();
 const loginId = ref('');
@@ -28,8 +28,7 @@ const handleLogin = async () => {
         }
     } catch (error) {
         console.error(error);
-        const msg = error.response?.data?.message || '로그인 실패';
-        errorMsg.value = msg;
+      errorMsg.value = error.response?.data?.message || '로그인 실패';
     } finally {
         isLoading.value = false;
     }
@@ -41,11 +40,11 @@ const handleLogin = async () => {
   <div class="tteokbokki-app">
     <div class="auth-container">
       <!-- Decorator -->
-      <div class="auth-decor">🫑️</div>
+      <div class="auth-decor">🌶️</div>
       <div class="premium-card auth-card">
         <header class="auth-header">
           <div class="brand">
-            <span class="brand-icon">🫑️</span>
+            <span class="brand-icon">🌶️</span>
             <h1 class="brand-name">SPICY</h1>
           </div>
           <p class="auth-subtitle">맛있는 서비스 이용을 위해 로그인해주세요</p>
