@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class SettlementFileSaveTest {
+class SettlementFileSaveTests {
 
     @InjectMocks
     private SettlementFileService settlementFileService;
