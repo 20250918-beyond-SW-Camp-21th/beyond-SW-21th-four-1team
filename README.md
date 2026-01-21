@@ -424,7 +424,10 @@ pipeline {
         MANIFEST_GITHUB_URL = 'https://github.com/rlatjddms/devops-1team-manifest.git'
         GIT_USERNAME = 'rlatjddms'
         GIT_EMAIL = 'kseo_o@naver.com'
-        DOCKER_IMAGE = 'tjddms/spicy-backend'
+        
+        BACKEND_IMAGE = 'tjddms/spicy-backend'
+        FRONTEND_IMAGE = 'tjddms/spicy-frontend'
+        
         DOCKER_API_VERSION = '1.44'
     }
 
@@ -453,15 +456,20 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_PASSWORD', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        dir('backend') {
-                            if (isUnix()) {
-                                sh "docker build -t ${env.DOCKER_IMAGE}:${currentBuild.number} ."
-                                sh "docker build -t ${env.DOCKER_IMAGE}:latest ."
+                        try {
+                            dir('backend') {
                                 sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
-                                sh "docker push ${env.DOCKER_IMAGE}:${currentBuild.number}"
-                                sh "docker push ${env.DOCKER_IMAGE}:latest"
-                                sh "docker logout"
+                                sh "docker build -t ${env.BACKEND_IMAGE}:${currentBuild.number} ."
+                                sh "docker push ${env.BACKEND_IMAGE}:${currentBuild.number}"
                             }
+
+                            dir('frontend') {
+                                sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}"
+                                sh "docker build -t ${env.FRONTEND_IMAGE}:${currentBuild.number} ."
+                                sh "docker push ${env.FRONTEND_IMAGE}:${currentBuild.number}"
+                            }
+                        } finally {
+                            sh "docker logout"
                         }
                     }
                 }
@@ -480,9 +488,14 @@ pipeline {
                                 sh """
                                     YML_FILES=\$(find . -type f \\( -name "*.yml" -o -name "*.yaml" \\))
                                     for f in \$YML_FILES; do
-                                        if grep -q "${env.DOCKER_IMAGE}" "\$f"; then
-                                            echo "Updating image version in: \$f"
-                                            sed -i "s|${env.DOCKER_IMAGE}:.*|${env.DOCKER_IMAGE}:${currentBuild.number}|g" "\$f"
+                                        if grep -q "${env.BACKEND_IMAGE}" "\$f"; then
+                                            echo "Updating Backend image in: \$f"
+                                            sed -i "s|${env.BACKEND_IMAGE}:.*|${env.BACKEND_IMAGE}:${currentBuild.number}|g" "\$f"
+                                        fi
+                                        
+                                        if grep -q "${env.FRONTEND_IMAGE}" "\$f"; then
+                                            echo "Updating Frontend image in: \$f"
+                                            sed -i "s|${env.FRONTEND_IMAGE}:.*|${env.FRONTEND_IMAGE}:${currentBuild.number}|g" "\$f"
                                         fi
                                     done
                                     
@@ -502,13 +515,10 @@ pipeline {
 
     post {
         success {
-            echo '모든 빌드와 배포 성공!'
+            echo '백엔드와 프론트엔드 모두 빌드 및 Manifest 업데이트 성공!'
         }
         failure {
-            echo '빌드 실패! 로그를 확인하여 문제를 해결해 주세요.'
-        }
-        always {
-            echo '파이프라인 종료.'
+            echo '빌드 실패! 로그를 확인해 주세요.'
         }
     }
 }
