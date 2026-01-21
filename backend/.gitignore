@@ -56,6 +56,4 @@ out/
 application-local.yml
 # local spring config
 backend/src/main/resources/application-local.yml
-
-
 *.env
