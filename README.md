@@ -16,19 +16,21 @@
 
 5. [요구사항 정의서](#5-요구사항-정의서)
 
-6. [화면 흐름도](#6-화면-흐름도-)
+6. [테스트 케이스](#6-테스트-케이스)
 
-7. [메뉴 구성도](#7-메뉴-구성도-)
+7. [화면 흐름도](#7-화면-흐름도-)
 
-8. [시스템 아키텍처](#8-시스템-아키텍처)
+8. [메뉴 구성도](#8-메뉴-구성도-)
 
-9. [ERD](#9-erd)
+9. [시스템 아키텍처](#9-시스템-아키텍처)
 
-10. [젠킨스 스크립트](#10-젠킨스-스크립트-)
+10. [ERD](#10-erd)
 
-11. [CI/CD 테스트](#11-cicd-테스트-)
+11. [젠킨스 스크립트](#11-젠킨스-스크립트-)
 
-12. [회고](#12-회고)
+12. [CI/CD 테스트](#12-cicd-테스트-)
+
+13. [회고](#13-회고)
 
 
 
@@ -374,8 +376,12 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 <img width="1343" height="703" alt="Image" src="https://github.com/user-attachments/assets/bb30e293-1514-4807-91b7-37ce595e6ed9" />
 
 ---
+## 6. 테스트 케이스
+<img width="1669" height="579" alt="Image" src="https://github.com/user-attachments/assets/eccfec39-6782-411a-866a-9189df7f8942" />
+<img width="1664" height="265" alt="Image" src="https://github.com/user-attachments/assets/4610c80c-a566-4438-ac32-bf160e449822" />
 
-## 6. 화면 흐름도 🔀 
+
+## 7. 화면 흐름도 🔀 
 
 #### 계정
 <img width="1039" height="688" alt="Image" src="https://github.com/user-attachments/assets/e0914e76-d69e-4002-b1e3-e4567cbee6da" />
@@ -394,23 +400,23 @@ develop & main branch로 merge할 때에는 pull request가 필요합니다. pul
 
 ---
 
-## 7. 메뉴 구성도 🗂
+## 8. 메뉴 구성도 🗂
 
 <img width="1668" height="701" alt="Image" src="https://github.com/user-attachments/assets/3d5d280f-c06d-4208-9623-7c0b38d0e4f9" />
 
 ---
 
-## 8. 시스템 아키텍처
+## 9. 시스템 아키텍처
 <img width="981" height="677" alt="Image" src="https://github.com/user-attachments/assets/669d27a2-dfc9-4636-ba72-e6d81444f01f" />
 
 ---
 
-## 9. ERD
+## 10. ERD
 <img width="2038" height="4280" alt="Image" src="https://github.com/user-attachments/assets/1a3b95ef-d037-457c-b7c3-9d9afdbeb59a" />
 
 ---
 
-## 10. 젠킨스 스크립트 🧪
+## 11. 젠킨스 스크립트 🧪
 
 <details>
   <summary>코드</summary>
@@ -528,7 +534,7 @@ pipeline {
 
 ---
 
-## 11. CI/CD 테스트 🔁
+## 12. CI/CD 테스트 🔁
 
 #### 젠킨스
 
@@ -539,7 +545,7 @@ pipeline {
 <img width="1365" height="905" alt="Image" src="https://github.com/user-attachments/assets/9fabaee2-9c1e-457b-bab1-74a30734aefa" />
 
 
-## 12. 회고
+## 13. 회고
 
 | 이름 | 회고 |
 | --- | --- |
