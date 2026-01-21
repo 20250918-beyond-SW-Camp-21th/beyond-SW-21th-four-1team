@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router';
 import { settlementApi } from '../api/settlementApi';
 import SettlementFilter from '../components/SettlementFilter.vue';
 import MonthlyTable from '../components/MonthlyTable.vue';
+import SettlementChart from '../components/SettlementChart.vue';
+import BarChart from '../components/BarChart.vue';
 
 const router = useRouter();
 
@@ -13,6 +15,8 @@ const loading = ref(false);
 const error = ref(null);
 const isCreating = ref(false);
 const creationProgress = ref({ current: 0, total: 0, successCount: 0 });
+const statsData = ref([]);
+const statsLoading = ref(false);
 const currentFilters = ref({ 
   storeId: 1, 
   productId: 1,
@@ -129,6 +133,102 @@ const handleCreateMonthlySettlement = async () => {
   }
 };
 
+// 월간 통계 데이터 로드 (샘플 데이터: 2025.06 ~ 2026.01)
+const loadMonthlyStats = async () => {
+  statsLoading.value = true;
+  try {
+    // 샘플 데이터 생성 (2025년 6월 ~ 2026년 1월, 8개월)
+    const statsArray = [];
+    const startYear = 2025;
+    const startMonth = 6; // 6월
+    
+    for (let i = 0; i < 8; i++) {
+      const monthIndex = startMonth + i;
+      const year = monthIndex > 12 ? 2026 : startYear;
+      const month = monthIndex > 12 ? monthIndex - 12 : monthIndex;
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-15`; // 15일로 설정
+      
+      statsArray.push({
+        date: dateStr,
+        settlementDate: dateStr,
+        orderCount: Math.floor(Math.random() * 300) + 100, // 100-400 건
+        dailyAmount: Math.floor(Math.random() * 10000000) + 5000000 // 500만~1500만원
+      });
+    }
+    
+    console.log('📊 Sample monthly stats generated (2025.06 ~ 2026.01):', statsArray);
+    statsData.value = statsArray;
+  } catch (err) {
+    console.error('Error loading monthly stats:', err);
+    statsData.value = [];
+  } finally {
+    statsLoading.value = false;
+  }
+};
+
+// 월간 매출 추이 차트 데이터
+const monthlySalesChartData = computed(() => {
+  if (!statsData.value || statsData.value.length === 0) {
+    return {
+      labels: [],
+      datasets: []
+    };
+  }
+  
+  const labels = statsData.value.map(item => {
+    const date = new Date(item.date || item.settlementDate);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  });
+  
+  const amounts = statsData.value.map(item => Number(item.dailyAmount) || 0);
+  
+  return {
+    labels,
+    datasets: [
+      {
+        label: '월간 매출 추이',
+        data: amounts,
+        borderColor: '#fb7185',
+        backgroundColor: 'rgba(251, 113, 133, 0.2)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 3,
+        pointHoverRadius: 5
+      }
+    ]
+  };
+});
+
+// 월간 주문 건수 차트 데이터
+const monthlyOrdersChartData = computed(() => {
+  if (!statsData.value || statsData.value.length === 0) {
+    return {
+      labels: [],
+      datasets: []
+    };
+  }
+  
+  const labels = statsData.value.map(item => {
+    const date = new Date(item.date || item.settlementDate);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  });
+  
+  const counts = statsData.value.map(item => Number(item.orderCount) || 0);
+  
+  return {
+    labels,
+    datasets: [
+      {
+        label: '주문 건수',
+        data: counts,
+        backgroundColor: '#fb923c',
+        borderColor: '#f97316',
+        borderWidth: 1
+      }
+    ]
+  };
+});
+
 // 초기 데이터 로드
 onMounted(() => {
   loadMonthlySettlement(currentFilters.value);
@@ -188,6 +288,40 @@ onMounted(() => {
         :loading="loading"
         @download-pdf="handleDownloadPdf"
       />
+
+      <!-- 그래프 섹션 -->
+      <div class="charts-section">
+        <div class="section-header">
+          <h3 class="section-title">📊 월간 매출 추이</h3>
+          <button class="btn-spicy chart-load-btn" @click="loadMonthlyStats" :disabled="statsLoading">
+            <span v-if="statsLoading">⏳ 조회 중...</span>
+            <span v-else>📊 그래프 조회하기</span>
+          </button>
+        </div>
+        
+        <div v-if="statsLoading" class="chart-loading premium-card">
+          <div class="tteok-spinner">🥘</div>
+          <p>통계 데이터를 불러오는 중...</p>
+        </div>
+        
+        <div v-else-if="statsData.length > 0" class="charts-grid">
+          <div class="chart-card premium-card">
+            <h4 class="chart-title">💰 월간 매출</h4>
+            <SettlementChart :chart-data="monthlySalesChartData" />
+          </div>
+          
+          <div class="chart-card premium-card">
+            <h4 class="chart-title">📦 월간 주문 건수</h4>
+            <BarChart :chart-data="monthlyOrdersChartData" />
+          </div>
+        </div>
+        
+        <div v-else class="chart-empty premium-card">
+          <span class="empty-icon">📊</span>
+          <p>통계 데이터가 없습니다.</p>
+          <p class="hint">위의 "그래프 조회하기" 버튼을 눌러주세요.</p>
+        </div>
+      </div>
     </main>
   </div>
 </template>
@@ -319,7 +453,87 @@ onMounted(() => {
   border-radius: 10px;
 }
 
+.charts-section {
+  margin-top: 3rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--deep-brown);
+  margin: 0;
+}
+
+.chart-load-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+}
+
+.chart-card {
+  padding: 2rem;
+  animation: pop 0.4s ease-out;
+}
+
+.chart-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--deep-brown);
+  margin: 0 0 1.5rem 0;
+}
+
+.chart-loading,
+.chart-empty {
+  padding: 3rem;
+  text-align: center;
+}
+
+.chart-loading .tteok-spinner {
+  font-size: 3rem;
+  animation: rotate 1.5s infinite linear;
+  margin-bottom: 1rem;
+}
+
+.chart-empty .empty-icon {
+  font-size: 4rem;
+  opacity: 0.2;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.chart-loading p,
+.chart-empty p {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.chart-empty .hint {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sauce-orange);
+  margin-top: 0.5rem;
+}
+
 @media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
   .nav-container {
     flex-direction: column;
     align-items: stretch;

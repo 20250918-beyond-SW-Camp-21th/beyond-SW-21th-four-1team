@@ -1,13 +1,11 @@
 import api from '@/api/axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1/settlements';
-
 export const settlementApi = {
     // 일별 정산 조회
     async getDailySettlement(storeId, productId, date) {
         console.log(`Fetching daily settlement for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/daily`, {
+            const response = await api.get('/settlements/daily', {
                 params: { storeId, productId, date }
             });
             console.log("Daily Settlement API Response:", response.data);
@@ -22,7 +20,7 @@ export const settlementApi = {
     async getMonthlySettlement(storeId, productId, yearMonth) {
         console.log(`Fetching monthly settlement for store ${storeId}, product ${productId} for ${yearMonth}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/monthly`, {
+            const response = await api.get('/settlements/monthly', {
                 params: { storeId, productId, yearMonth }
             });
             console.log("Monthly Settlement API Response:", response.data);
@@ -37,7 +35,7 @@ export const settlementApi = {
     async getSettlementList(storeId) {
         console.log(`Fetching settlement list for store ${storeId}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/list`, {
+            const response = await api.get('/settlements/list', {
                 params: { storeId }
             });
             console.log("Settlement List API Response:", response.data);
@@ -52,7 +50,7 @@ export const settlementApi = {
     async getSettlementOrderDetails(storeId, date) {
         console.log(`Fetching settlement order details for store ${storeId} on ${date}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/details`, {
+            const response = await api.get('/settlements/details', {
                 params: { storeId, date }
             });
             console.log("Settlement Order Details API Response:", response.data);
@@ -67,7 +65,7 @@ export const settlementApi = {
     async getSettlementStats(storeId, startDate, endDate) {
         console.log(`Fetching settlement stats for store ${storeId} from ${startDate} to ${endDate}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/stats`, {
+            const response = await api.get('/settlements/stats', {
                 params: { storeId, startDate, endDate }
             });
             console.log("Settlement Stats API Response:", response.data);
@@ -82,7 +80,7 @@ export const settlementApi = {
     async downloadMonthlyPdf(storeId, productId, yearMonth) {
         console.log(`Downloading monthly PDF for store ${storeId}, product ${productId} for ${yearMonth}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/monthly/download`, {
+            const response = await api.get('/settlements/monthly/download', {
                 params: { storeId, productId, yearMonth },
                 responseType: 'blob'
             });
@@ -111,7 +109,7 @@ export const settlementApi = {
     async downloadDailyPdf(storeId, productId, date) {
         console.log(`Downloading daily PDF for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/daily/download`, {
+            const response = await api.get('/settlements/daily/download', {
                 params: { storeId, productId, date },
                 responseType: 'blob'
             });
@@ -140,7 +138,7 @@ export const settlementApi = {
     async downloadPdfById(settlementId) {
         console.log(`Downloading PDF for settlement ID ${settlementId}...`);
         try {
-            const response = await api.get(`${API_BASE_URL}/${settlementId}/download`, {
+            const response = await api.get(`/settlements/${settlementId}/download`, {
                 responseType: 'blob'
             });
 
@@ -179,7 +177,7 @@ export const settlementApi = {
     async createSettlement(storeId, productId, date) {
         console.log(`Creating settlement for store ${storeId}, product ${productId} on ${date}...`);
         try {
-            const response = await api.post(`${API_BASE_URL}/generate`, {
+            const response = await api.post('/settlements/generate', {
                 storeId,
                 productId,
                 date
@@ -188,6 +186,19 @@ export const settlementApi = {
             return response.data;
         } catch (error) {
             console.error('Error creating settlement:', error);
+            throw error;
+        }
+    },
+
+    // 주문 목록 조회 (상태별)
+    async getOrdersByStatus(storeId, status = 'ALL') {
+        console.log(`Fetching orders for store ${storeId} with status ${status}...`);
+        try {
+            const response = await api.get(`/orders/${status}/${storeId}`);
+            console.log('Orders API Response:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching orders:', error);
             throw error;
         }
     }
